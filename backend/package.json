@@ -3,7 +3,7 @@
   "name": "ai-clothing-brand-backend",
   "version": "1.0.0",
   "scripts": {
-    "build": "next build",
+    "build": "prisma generate && next build",
     "prisma:push": "prisma db push",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
