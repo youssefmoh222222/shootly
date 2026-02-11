@@ -30,15 +30,15 @@ function uiResolvePlugin() {
 }
 
 // Vercel backend URL - update this when deploying to production
-// The backend is deployed at: https://shootly-i1im.vercel.app
-const VERCEL_BACKEND_URL = 'https://shootly-i1im.vercel.app';
+// The backend is deployed at: https://shootly-d3yy.vercel.app
+const VERCEL_BACKEND_URL = 'https://shootly-d3yy.vercel.app';
 
 export default defineConfig({
   plugins: [react(), uiResolvePlugin()],
   define: {
     // Inject the backend URL at build time based on environment
     'import.meta.env.VITE_API_URL': JSON.stringify(
-      process.env.VITE_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://shootly-i1im.vercel.app')
+      process.env.VITE_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://shootly-d3yy.vercel.app')
     )
   },
   resolve: {

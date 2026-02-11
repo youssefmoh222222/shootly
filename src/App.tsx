@@ -9,7 +9,7 @@ import { LandingPage } from './components/LandingPage.tsx';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Backend API URL - Dev uses Vite proxy (/api → localhost:3001), prod hits Vercel directly
-const API_URL = import.meta.env.DEV ? '/api' : 'https://shootly-i1im.vercel.app/api'
+const API_URL = import.meta.env.DEV ? '/api' : 'https://shootly-d3yy.vercel.app/api'
 
 // Log the API URL for debugging
 console.log('API_URL:', API_URL);
