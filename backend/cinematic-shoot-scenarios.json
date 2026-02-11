@@ -1,0 +1,425 @@
+{
+  "modelProfiles": {
+    "description": "Use these detailed model descriptions to ensure consistent, diverse representation across all scenarios",
+    "howToUse": "Add model profile at the START of any runway prompt. Example: '[Model A] + [Scenario Prompt]'",
+    "profiles": {
+      "modelA_female_athletic": {
+        "descriptor": "Athletic woman in her late 20s, fit physique, medium skin tone, natural makeup, dark hair in low ponytail",
+        "bestFor": "Gymwear, athletic, streetwear, casual lifestyle",
+        "shorthand": "Athletic woman, late 20s, medium tone, fit build"
+      },
+      "modelB_male_professional": {
+        "descriptor": "Professional man in his mid 30s, lean athletic build, light-medium skin tone, clean groomed appearance, short dark hair",
+        "bestFor": "Medical wear, luxury, business, minimalist streetwear",
+        "shorthand": "Professional man, mid 30s, lean build, groomed"
+      },
+      "modelC_female_elegant": {
+        "descriptor": "Elegant woman in her early 30s, graceful posture, deep skin tone, sophisticated presence, natural curly hair",
+        "bestFor": "Luxury, evening wear, artistic, lifestyle premium",
+        "shorthand": "Elegant woman, early 30s, deep tone, graceful"
+      },
+      "modelD_male_urban": {
+        "descriptor": "Urban man in his early 20s, slim athletic build, medium-dark skin tone, contemporary style, fade haircut",
+        "bestFor": "Streetwear, urban lifestyle, football wear, casual",
+        "shorthand": "Urban man, early 20s, slim athletic, contemporary"
+      },
+      "modelE_female_creative": {
+        "descriptor": "Creative woman in her late 20s, artistic presence, fair skin tone, unique features, shoulder-length auburn hair",
+        "bestFor": "Artistic, sustainable, creative workspace, avant-garde",
+        "shorthand": "Creative woman, late 20s, fair tone, artistic"
+      },
+      "modelF_male_senior": {
+        "descriptor": "Distinguished man in his late 40s, refined build, salt-and-pepper hair, mature confident presence, light-medium skin tone",
+        "bestFor": "Luxury old money, executive, heritage, formal",
+        "shorthand": "Distinguished man, late 40s, refined, mature presence"
+      },
+      "modelG_female_youth": {
+        "descriptor": "Young woman in her early 20s, fresh energetic presence, medium skin tone, long dark hair, Gen-Z aesthetic",
+        "bestFor": "Streetwear, casual, social media focused, youth culture",
+        "shorthand": "Young woman, early 20s, energetic, Gen-Z"
+      },
+      "modelH_male_fitness": {
+        "descriptor": "Fitness model man in his late 20s, muscular athletic build, deep skin tone, defined physique, short natural hair",
+        "bestFor": "Gymwear, performance athletic, outdoor training, sports",
+        "shorthand": "Fitness man, late 20s, muscular, deep tone"
+      },
+      "modelI_female_minimalist": {
+        "descriptor": "Minimalist woman in her mid 30s, clean aesthetic, East Asian features, medium-fair skin tone, straight black hair",
+        "bestFor": "Minimalist, modern clinic, tech streetwear, clean lines",
+        "shorthand": "Minimalist woman, mid 30s, Asian features, clean aesthetic"
+      },
+      "modelJ_male_vintage": {
+        "descriptor": "Vintage-styled man in his early 30s, classic handsome features, Mediterranean skin tone, styled beard, retro appeal",
+        "bestFor": "Retro street, period drama, heritage, vintage-inspired",
+        "shorthand": "Vintage-styled man, early 30s, Mediterranean, styled beard"
+      },
+      "modelK_nonbinary_contemporary": {
+        "descriptor": "Contemporary nonbinary person in their mid 20s, androgynous features, medium skin tone, modern edge, undercut hairstyle",
+        "bestFor": "Avant-garde, artistic, tech streetwear, contemporary fashion",
+        "shorthand": "Nonbinary, mid 20s, androgynous, contemporary edge"
+      },
+      "modelL_female_mature": {
+        "descriptor": "Mature woman in her early 40s, sophisticated elegance, fair skin tone, refined features, styled blonde hair",
+        "bestFor": "Luxury, executive, evening wear, refined casual",
+        "shorthand": "Mature woman, early 40s, sophisticated, refined"
+      }
+    }
+  },
+  "diversityGuidelines": {
+    "skinTones": "Use varied representation: fair, light-medium, medium, medium-dark, deep, rich brown",
+    "bodyTypes": "Include diverse builds: slim, athletic, fit, lean, muscular, curvy, plus-size, average",
+    "ageRange": "Represent all demographics: early 20s (youth), late 20s-early 30s (prime), mid 30s-40s (mature), 45+ (distinguished)",
+    "ethnicFeatures": "Specify when helpful: Asian, African, European, Latin, Mediterranean, Middle Eastern, mixed heritage",
+    "gender": "Include: men, women, nonbinary, gender-fluid presentations",
+    "accessibility": "Consider: different abilities, adaptive fashion needs"
+  },
+  "cinematicShootScenarios": {
+    "medicalWear": {
+      "brandProfile": "Medical Wear",
+      "scenarios": {
+        "clinicalProfessional": {
+          "name": "Clinical Professional",
+          "description": "Hospital setting, professional demeanor, clinical lighting",
+          "bestFor": "Traditional medical uniforms, scrubs",
+          "runwayPrompt": "Healthcare professional walking steadily through bright modern hospital corridor, clean medical scrubs, confident posture, clinical LED lighting, fabric drape visible, sterile white environment, professional stride"
+        },
+        "emergencyResponse": {
+          "name": "Emergency Response",
+          "description": "Action shots in ER, dynamic movement, urgency",
+          "bestFor": "Emergency medical gear, functional wear",
+          "runwayPrompt": "Medical professional rushing through busy ER, emergency gear with utility pockets, urgent purposeful movement, sweat visible, dynamic lighting, fabric moving with speed, intense focus"
+        },
+        "surgicalPrecision": {
+          "name": "Surgical Precision",
+          "description": "Operating room, sterile environment, precision focus",
+          "bestFor": "Surgical attire, sterile wear",
+          "runwayPrompt": "Surgeon in sterile scrubs preparing in OR, precise controlled hand movements, bright overhead surgical lights, seamless fabric detail, operating room backdrop, methodical gestures"
+        },
+        "comfortCare": {
+          "name": "Comfort Care",
+          "description": "Relaxed hospital settings, comfort focus, soft lighting",
+          "bestFor": "Patient care uniforms, comfortable scrubs",
+          "runwayPrompt": "Healthcare worker moving gently through hospital lounge, soft comfortable scrubs, caring gestures, natural window light, warm atmosphere, fabric softness evident, relaxed compassionate demeanor"
+        },
+        "modernClinic": {
+          "name": "Modern Clinic",
+          "description": "Contemporary clinic interiors, minimalist design",
+          "bestFor": "Private practice wear, modern medical fashion",
+          "runwayPrompt": "Medical professional walking through minimalist contemporary clinic, sleek modern scrubs, sophisticated movement, clean architectural lighting, premium fabric visible, refined professional presence"
+        }
+      }
+    },
+    "footballWear": {
+      "brandProfile": "Football Wear (As Streetwear)",
+      "scenarios": {
+        "retroStreetStyle": {
+          "name": "Retro Street Style",
+          "description": "Vintage football shirts worn casually, urban settings",
+          "bestFor": "Vintage-inspired designs, retro collections",
+          "runwayPrompt": "Person walking confidently through urban alley, vintage football shirt, golden hour light, graffiti walls, distressed fabric texture, nostalgic graphics visible, casual street swagger"
+        },
+        "premiumCasual": {
+          "name": "Premium Casual",
+          "description": "Upscale football-inspired polos, sophisticated settings",
+          "bestFor": "Luxury football wear, office-appropriate designs",
+          "runwayPrompt": "Professional moving through upscale cafe, premium football polo with embroidered crest, refined casual movement, warm elegant lighting, fabric quality visible, sophisticated urban setting"
+        },
+        "deconstructedAvantGarde": {
+          "name": "Deconstructed Avant-Garde",
+          "description": "Artistic reconstruction, fashion-forward styling",
+          "bestFor": "Experimental designs, high-fashion collections",
+          "runwayPrompt": "Model in deconstructed football piece moving through gallery, avant-garde silhouette, experimental construction visible, dramatic editorial lighting, artistic space, innovative movement"
+        },
+        "techStreetwear": {
+          "name": "Tech Streetwear",
+          "description": "Technical fabrics, futuristic urban environments",
+          "bestFor": "Performance-inspired streetwear, modern designs",
+          "runwayPrompt": "Person walking through neon-lit futuristic city, technical football jacket, reflective panels catching light, cyberpunk atmosphere, innovative fabric visible, confident tech-savvy movement"
+        },
+        "weekendCasual": {
+          "name": "Weekend Casual",
+          "description": "Comfortable football sweaters, cozy settings",
+          "bestFor": "Loungewear, casual collections",
+          "runwayPrompt": "Person moving relaxed through cozy cafe, football-inspired sweater, soft knit texture visible, warm lighting, comfortable casual gestures, weekend atmosphere, gentle movement"
+        }
+      }
+    },
+    "streetwear": {
+      "brandProfile": "Streetwear",
+      "scenarios": {
+        "urbanGraffiti": {
+          "name": "Urban Graffiti",
+          "description": "Street art backgrounds, edgy styling",
+          "bestFor": "Bold graphic designs, youth collections",
+          "runwayPrompt": "Streetwear model walking through graffiti alley, graphic hoodie, bold prints visible, edgy confident stance, vibrant street art backdrop, urban lighting, authentic street attitude"
+        },
+        "minimalistUrban": {
+          "name": "Minimalist Urban",
+          "description": "Clean architectural backgrounds, minimalist styling",
+          "bestFor": "Minimalist designs, premium basics",
+          "runwayPrompt": "Model moving through modern concrete architecture, minimalist streetwear, clean lines, refined urban movement, geometric shadows, premium fabric drape, sophisticated simplicity"
+        },
+        "highFashionEditorial": {
+          "name": "High-Fashion Editorial",
+          "description": "Magazine-style shoots, dramatic lighting",
+          "bestFor": "Designer collections, runway pieces",
+          "runwayPrompt": "Fashion model in designer streetwear, dramatic studio lighting, luxury construction visible, high-fashion pose and movement, strong shadows, avant-garde styling, editorial sophistication"
+        },
+        "skateCulture": {
+          "name": "Skate Culture",
+          "description": "Skatepark environments, action shots",
+          "bestFor": "Skate-inspired wear, active streetwear",
+          "runwayPrompt": "Skater moving through urban skatepark, functional skate wear, dynamic action movement, raw concrete setting, reinforced fabric visible, authentic youth energy, afternoon shadows"
+        },
+        "luxuryStreet": {
+          "name": "Luxury Street",
+          "description": "Upscale urban locations, premium styling",
+          "bestFor": "Luxury streetwear, high-end collections",
+          "runwayPrompt": "Model on upscale rooftop, luxury streetwear, premium materials visible, sophisticated urban movement, golden hour cityscape, refined fabric details, elegant casual presence"
+        }
+      }
+    },
+    "luxuryOldMoney": {
+      "brandProfile": "Luxury/Old Money",
+      "scenarios": {
+        "privateClubElegance": {
+          "name": "Private Club Elegance",
+          "description": "Members club interiors, refined atmosphere",
+          "bestFor": "Tailored suits, formal wear",
+          "runwayPrompt": "Gentleman in bespoke suit moving through private club, impeccable tailoring visible, leather chairs and wood paneling, warm chandelier lighting, aristocratic posture, refined confident movement"
+        },
+        "countryEstate": {
+          "name": "Country Estate",
+          "description": "Manor house settings, traditional elegance",
+          "bestFor": "Heritage collections, classic designs",
+          "runwayPrompt": "Person in heritage tweed walking estate grounds, classic tailoring, manor house backdrop, golden afternoon light, traditional fabrics visible, timeless elegant movement, manicured lawns"
+        },
+        "boardroomPower": {
+          "name": "Boardroom Power",
+          "description": "Executive office settings, professional authority",
+          "bestFor": "Business attire, power dressing",
+          "runwayPrompt": "Executive in power suit moving through modern boardroom, structured tailoring, commanding presence, floor-to-ceiling windows, professional lighting, cityscape visible, authoritative stride"
+        },
+        "eveningSoiree": {
+          "name": "Evening Soiree",
+          "description": "Gala event settings, evening glamour",
+          "bestFor": "Evening wear, formal attire",
+          "runwayPrompt": "Person in black-tie attire moving through gala venue, formal elegance, chandelier lighting, luxurious fabrics draped, sophisticated movement, grand architecture, evening glamour"
+        },
+        "yachtClub": {
+          "name": "Yacht Club",
+          "description": "Nautical settings, leisure luxury",
+          "bestFor": "Resort wear, leisure collections",
+          "runwayPrompt": "Person in luxury leisure wear walking yacht club, premium casual fabrics, nautical setting with boats, bright maritime light, relaxed elegant movement, sophisticated resort style"
+        }
+      }
+    },
+    "gymwear": {
+      "brandProfile": "Gymwear",
+      "scenarios": {
+        "performanceAction": {
+          "name": "Performance Action",
+          "description": "Gym action shots, dynamic movement",
+          "bestFor": "Performance activewear, training gear",
+          "runwayPrompt": "Athlete training intensely in modern gym, performance wear with compression fit, dynamic explosive movement, sweat visible, bright gym lighting, technical fabric stretch evident, muscular definition"
+        },
+        "studioFitness": {
+          "name": "Studio Fitness",
+          "description": "Fitness studio, clean lines, yoga/pilates",
+          "bestFor": "Studio wear, yoga collections",
+          "runwayPrompt": "Yoga practitioner flowing through poses, studio wear stretching naturally, peaceful studio space, soft natural light, four-way stretch fabric visible, mindful graceful movement, zen atmosphere"
+        },
+        "streetToGym": {
+          "name": "Street-to-Gym",
+          "description": "Urban to gym transition, versatile styling",
+          "bestFor": "Hybrid wear, athleisure",
+          "runwayPrompt": "Person transitioning from city street to gym, athleisure wear, versatile styling visible, mixed urban and gym environments, functional fashion, lifestyle movement, adaptable design evident"
+        },
+        "outdoorTraining": {
+          "name": "Outdoor Training",
+          "description": "Outdoor fitness environments, natural settings",
+          "bestFor": "Outdoor training gear, trail wear",
+          "runwayPrompt": "Athlete training in natural park setting, outdoor performance gear, weather-resistant fabric visible, trail environment, golden hour natural light, dynamic outdoor movement, functional design"
+        },
+        "recoveryLounge": {
+          "name": "Recovery Lounge",
+          "description": "Post-workout settings, recovery focus",
+          "bestFor": "Recovery wear, comfort-focused designs",
+          "runwayPrompt": "Person relaxing in spa lounge, soft recovery wear, ultra-comfortable fabric visible, gentle restful movement, warm wellness lighting, post-workout peace, breathable materials evident"
+        }
+      }
+    },
+    "artisticCreative": {
+      "brandProfile": "Artistic/Creative",
+      "scenarios": {
+        "galleryExhibition": {
+          "name": "Gallery Exhibition",
+          "description": "Art gallery settings, creative atmosphere",
+          "bestFor": "Artistic collections, statement pieces",
+          "runwayPrompt": "Artist in conceptual fashion moving through contemporary gallery, wearable art piece, sculptural construction visible, dramatic gallery spotlights, white walls, artistic expressive movement, creative statement"
+        },
+        "studioCreative": {
+          "name": "Studio Creative",
+          "description": "Artist studio environments, creative process",
+          "bestFor": "Handmade designs, artisanal collections",
+          "runwayPrompt": "Artisan in handmade fashion working in studio, handcrafted details visible, natural window light, creative workspace, artisanal materials present, authentic maker movement, craft atmosphere"
+        },
+        "digitalArt": {
+          "name": "Digital Art",
+          "description": "Digital/tech environments, futuristic aesthetic",
+          "bestFor": "Digital print designs, tech-inspired wear",
+          "runwayPrompt": "Model in digital fashion moving through tech environment, innovative digital prints visible, neon LED lighting, futuristic setting with screens, cyberpunk aesthetic, tech-forward movement"
+        },
+        "sustainableCraft": {
+          "name": "Sustainable Craft",
+          "description": "Eco-friendly settings, craft emphasis",
+          "bestFor": "Sustainable collections, ethical fashion",
+          "runwayPrompt": "Person in sustainable fashion in natural setting, organic materials visible, eco-friendly atmosphere with plants, soft natural light, conscious mindful movement, ethical construction evident"
+        },
+        "performanceArt": {
+          "name": "Performance Art",
+          "description": "Theater/stage settings, dramatic expression",
+          "bestFor": "Statement pieces, performance wear",
+          "runwayPrompt": "Performer in theatrical fashion on stage, dramatic design visible, bold stage lighting with spotlights, expressive dramatic movement, theatrical atmosphere, performance-ready construction"
+        }
+      }
+    },
+    "ecommerce": {
+      "brandProfile": "E-commerce",
+      "scenarios": {
+        "whiteBackgroundProduct": {
+          "name": "White Background Product",
+          "description": "Clean studio, product-focused",
+          "bestFor": "E-commerce listings, product shots",
+          "runwayPrompt": "Model on pure white background, product garment centered, even studio lighting, slow rotation showing all angles, fabric details visible, minimal movement, clean product presentation, professional fit"
+        },
+        "flatLayStyle": {
+          "name": "Flat Lay Style",
+          "description": "Overhead shots, styled arrangements",
+          "bestFor": "Social media, catalog shots",
+          "runwayPrompt": "Overhead view of styled product arrangement, flat lay composition, complementary items visible, even diffused lighting, subtle organization movement, clean white surface, Instagram-ready styling"
+        },
+        "modelRotation": {
+          "name": "Model Rotation",
+          "description": "Multiple angles on model, 360 view",
+          "bestFor": "Online shopping, detailed views",
+          "runwayPrompt": "Model rotating 360 degrees, product visible from all angles, consistent even lighting throughout, slow systematic rotation, fabric drape evident, neutral background, comprehensive product view"
+        },
+        "detailCloseUps": {
+          "name": "Detail Close-ups",
+          "description": "Extreme close-ups, texture focus",
+          "bestFor": "Quality demonstration, fabric details",
+          "runwayPrompt": "Extreme close-up of product details, macro view of fabric texture, stitching visible, slow camera movement across material, precise lighting showing quality, craftsmanship evident, material weave clear"
+        },
+        "sizeColorVariations": {
+          "name": "Size/Color Variations",
+          "description": "Comparison shots, option displays",
+          "bestFor": "Product variations, choice presentation",
+          "runwayPrompt": "Product variations displayed side-by-side, multiple colors or sizes visible, systematic comparison layout, consistent lighting, organized presentation, clear differences shown, neutral background"
+        }
+      }
+    },
+    "cinematic": {
+      "brandProfile": "Cinematic",
+      "scenarios": {
+        "filmNoir": {
+          "name": "Film Noir",
+          "description": "Dramatic shadows, moody atmosphere",
+          "bestFor": "Dramatic designs, evening collections",
+          "runwayPrompt": "Model in noir fashion moving through dramatic shadows, high-contrast lighting, venetian blind shadows, moody urban setting, mysterious elegant movement, black and white aesthetic, cinematic silhouettes"
+        },
+        "goldenHour": {
+          "name": "Golden Hour",
+          "description": "Sunset lighting, warm tones",
+          "bestFor": "Casual wear, lifestyle collections",
+          "runwayPrompt": "Person in casual fashion during sunset, golden hour warm light, lens flares, romantic atmosphere, outdoor natural setting, dreamy soft movement, fabric glowing in sunlight, peaceful elegance"
+        },
+        "sciFiFuturism": {
+          "name": "Sci-Fi Futurism",
+          "description": "Futuristic lighting, tech environments",
+          "bestFor": "Modern designs, tech collections",
+          "runwayPrompt": "Model in futuristic fashion, neon lighting environment, sci-fi tech setting with holograms, cyberpunk atmosphere, innovative design visible, tech-enhanced movement, vibrant digital colors, future aesthetic"
+        },
+        "periodDrama": {
+          "name": "Period Drama",
+          "description": "Historical settings, period accuracy",
+          "bestFor": "Vintage-inspired, heritage collections",
+          "runwayPrompt": "Person in period-inspired fashion, historical setting with vintage architecture, era-appropriate movement, soft natural period lighting, heritage construction visible, timeless elegance, authentic historical atmosphere"
+        },
+        "documentaryRealism": {
+          "name": "Documentary Realism",
+          "description": "Natural lighting, authentic settings",
+          "bestFor": "Authentic brands, story-focused collections",
+          "runwayPrompt": "Person in authentic fashion, real-world natural setting, documentary-style natural lighting, genuine lifestyle movement, honest presentation, everyday environment, candid authentic atmosphere, relatable context"
+        }
+      }
+    },
+    "lifestyle": {
+      "brandProfile": "Lifestyle",
+      "scenarios": {
+        "urbanExplorer": {
+          "name": "Urban Explorer",
+          "description": "City exploration, travel context",
+          "bestFor": "Travel wear, versatile designs",
+          "runwayPrompt": "Urban explorer navigating city streets, travel-ready fashion, functional design visible, adventurous movement, dynamic city lighting, backpack and accessories, exploration energy, urban landscape"
+        },
+        "coffeeCulture": {
+          "name": "Coffee Culture",
+          "description": "Cafe settings, relaxed atmosphere",
+          "bestFor": "Casual wear, everyday collections",
+          "runwayPrompt": "Person enjoying urban cafe, casual comfortable fashion, relaxed social movement, warm cafe lighting with Edison bulbs, coffee shop atmosphere, everyday style visible, natural interactions, cozy ambiance"
+        },
+        "creativeWorkspace": {
+          "name": "Creative Workspace",
+          "description": "Creative office environments",
+          "bestFor": "Workwear, creative professional attire",
+          "runwayPrompt": "Creative professional in modern office, work-appropriate fashion, productive movement, inspiring workspace with plants, natural light, creative atmosphere, professional yet comfortable style, innovative setting"
+        },
+        "weekendGetaway": {
+          "name": "Weekend Getaway",
+          "description": "Vacation settings, leisure focus",
+          "bestFor": "Resort wear, vacation collections",
+          "runwayPrompt": "Person on weekend vacation, leisure resort wear, relaxed getaway movement, vacation destination setting, natural light, carefree atmosphere, comfortable elegant style, travel lifestyle, peaceful surroundings"
+        },
+        "nightOut": {
+          "name": "Night Out",
+          "description": "Evening venues, nightlife settings",
+          "bestFor": "Evening wear, going-out collections",
+          "runwayPrompt": "Person at nightlife venue, stylish evening fashion, confident night-out movement, dynamic club lighting with neon, urban nightlife atmosphere, dressed-up energy, vibrant night scene, social elegance"
+        }
+      }
+    }
+  },
+  "promptEnhancements": {
+    "runwayOptimization": {
+      "essentialElements": "subject action, garment type, lighting quality, environment, fabric movement, atmosphere",
+      "tokenEfficiency": "front-load critical details, combine related descriptors, avoid redundancy",
+      "motionKeywords": "walking, moving, rotating, flowing, transitioning, gesturing, training, relaxing",
+      "lightingShorthand": "golden hour, neon, studio, natural, dramatic, soft, bright, LED, chandelier, clinical",
+      "fabricVisibility": "drape visible, texture evident, stretch shown, movement clear, details apparent, quality displayed"
+    },
+    "brandSpecificShortcuts": {
+      "medicalWear": "clinical lighting, sterile environment, professional movement, healthcare setting",
+      "streetwear": "urban backdrop, confident swagger, street lighting, authentic attitude",
+      "luxuryOldMoney": "refined movement, premium visible, elegant lighting, sophisticated setting",
+      "gymwear": "dynamic action, performance fabric, athletic movement, gym/outdoor setting",
+      "artisticCreative": "creative expression, gallery/studio space, dramatic lighting, conceptual design",
+      "footballWear": "urban street energy, retro inspiration, fabric detail, sport-casual attitude",
+      "ecommerce": "clean studio lighting, even exposure, product focus, neutral background",
+      "cinematic": "dramatic atmosphere, cinematic lighting, mood-driven movement, visual storytelling",
+      "lifestyle": "natural setting, authentic movement, lifestyle context, everyday elegance"
+    }
+  },
+  "quickReferenceMatrix": {
+    "description": "Fast lookup: Best model for each brand category",
+    "medicalWear": ["modelB_male_professional", "modelC_female_elegant", "modelI_female_minimalist"],
+    "footballWear": ["modelD_male_urban", "modelJ_male_vintage", "modelG_female_youth"],
+    "streetwear": ["modelD_male_urban", "modelG_female_youth", "modelK_nonbinary_contemporary"],
+    "luxuryOldMoney": ["modelF_male_senior", "modelL_female_mature", "modelC_female_elegant"],
+    "gymwear": ["modelA_female_athletic", "modelH_male_fitness", "modelD_male_urban"],
+    "artisticCreative": ["modelE_female_creative", "modelK_nonbinary_contemporary", "modelJ_male_vintage"],
+    "ecommerce": ["modelA_female_athletic", "modelB_male_professional", "modelC_female_elegant"],
+    "cinematic": ["modelF_male_senior", "modelC_female_elegant", "modelK_nonbinary_contemporary"],
+    "lifestyle": ["modelA_female_athletic", "modelE_female_creative", "modelG_female_youth"]
+  }
+}
