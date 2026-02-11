@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String         @id @default(cuid())
+  email     String         @unique
+  password  String
+  credits   Int            @default(0)
+  createdAt DateTime       @default(now())
+  profiles  BrandProfile[]
+}
+
+model BrandProfile {
+  id             String       @id @default(cuid())
+  userId         String
+  name           String
+  description    String?
+  category       String
+  subCategories  String
+  brandTone      String
+  targetAudience String
+  environment    String
+  primaryColor   String?
+  secondaryColor String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id])
+  designs        Design[]
+  generations    Generation[]
+}
+
+model Design {
+  id             String       @id @default(cuid())
+  brandProfileId String
+  title          String?
+  imageUrl       String
+  backImageUrl   String?
+  customPrompt   String?
+  createdAt      DateTime     @default(now())
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id])
+  generations    Generation[]
+}
+
+model Generation {
+  id             String       @id @default(cuid())
+  brandProfileId String
+  designId       String?
+  type           String
+  promptUsed     String
+  resultUrl      String
+  createdAt      DateTime     @default(now())
+  design         Design?      @relation(fields: [designId], references: [id])
+  brandProfile   BrandProfile @relation(fields: [brandProfileId], references: [id])
+}
+
+model VideoJob {
+  id        String   @id @default(cuid())
+  userId    String
+  jobId     String
+  status    String
+  videoUrl  String?
+  createdAt DateTime @default(now())
+}

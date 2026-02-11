@@ -1,0 +1,419 @@
+{
+  "cinematicShootScenarios": {
+    "medicalWear": {
+      "brandProfile": "Medical Wear",
+      "scenarios": {
+        "clinicalProfessional": {
+          "name": "Clinical Professional",
+          "description": "Hospital setting, professional demeanor, clinical lighting",
+          "bestFor": "Traditional medical uniforms, scrubs",
+          "replicatePrompt": "professional medical scrubs, modern hospital corridor, clean clinical lighting, healthcare professional, detailed fabric texture, precise stitching details, sterile environment, 8k photorealistic, commercial medical photography, crisp details",
+          "runwayPrompt": "Healthcare professional walking through modern hospital corridor wearing medical scrubs, confident professional movement, clean clinical lighting, fabric texture and functionality focus, cinematic medical video"
+        },
+        "emergencyResponse": {
+          "name": "Emergency Response",
+          "description": "Action shots in ER, dynamic movement, urgency",
+          "bestFor": "Emergency medical gear, functional wear",
+          "replicatePrompt": "emergency medical wear, busy ER setting, action photography, dynamic movement, practical functionality, urgent atmosphere, detailed medical equipment, 8k detailed, healthcare in motion, commercial photography",
+          "runwayPrompt": "Medical professional in emergency response gear moving quickly through ER, urgent dynamic movement, high-energy lighting, functional wear details focus, cinematic emergency video"
+        },
+        "surgicalPrecision": {
+          "name": "Surgical Precision",
+          "description": "Operating room, sterile environment, precision focus",
+          "bestFor": "Surgical attire, sterile wear",
+          "replicatePrompt": "surgical scrubs, operating room setting, sterile environment, precise medical equipment, sharp focus, clinical sterility, detailed fabric construction, 8k clinical photography, medical precision, commercial quality",
+          "runwayPrompt": "Surgeon in sterile surgical attire preparing in operating room, precise controlled movements, bright surgical lighting, sterile fabric details focus, cinematic surgical video"
+        },
+        "comfortCare": {
+          "name": "Comfort Care",
+          "description": "Relaxed hospital settings, comfort focus, soft lighting",
+          "bestFor": "Patient care uniforms, comfortable scrubs",
+          "replicatePrompt": "comfortable medical wear, hospital lounge setting, soft natural lighting, relaxed healthcare professional, comfort demonstration, gentle atmosphere, fabric softness details, 8k lifestyle photography, caring environment",
+          "runwayPrompt": "Healthcare worker in comfortable medical wear moving through hospital lounge, gentle caring movements, soft natural lighting, comfort and fabric softness focus, cinematic care video"
+        },
+        "modernClinic": {
+          "name": "Modern Clinic",
+          "description": "Contemporary clinic interiors, minimalist design",
+          "bestFor": "Private practice wear, modern medical fashion",
+          "replicatePrompt": "modern medical wear, contemporary clinic interior, minimalist design, professional setting, sleek aesthetic, clean lines, sophisticated medical fashion, 8k architectural photography, luxury healthcare setting",
+          "runwayPrompt": "Medical professional in modern clinic wear walking through contemporary clinic, sophisticated professional movement, minimalist architectural lighting, sleek design details focus, cinematic modern medical video"
+        }
+      }
+    },
+    "footballWear": {
+      "brandProfile": "Football Wear (As Streetwear)",
+      "scenarios": {
+        "retroStreetStyle": {
+          "name": "Retro Street Style",
+          "description": "Vintage football shirts worn casually, urban settings",
+          "bestFor": "Vintage-inspired designs, retro collections",
+          "replicatePrompt": "vintage football shirt, urban street setting, retro streetwear style, distressed aesthetic, casual wear, nostalgic atmosphere, detailed vintage graphics, 8k street photography, nostalgic football fashion, authentic street culture",
+          "runwayPrompt": "Person wearing vintage football shirt walking through urban streets, casual confident movement, golden hour street lighting, distressed fabric texture and vintage graphics focus, cinematic retro streetwear video"
+        },
+        "premiumCasual": {
+          "name": "Premium Casual",
+          "description": "Upscale football-inspired polos, sophisticated settings",
+          "bestFor": "Luxury football wear, office-appropriate designs",
+          "replicatePrompt": "premium football polo, luxury urban cafe, sophisticated streetwear, detailed embroidery, upscale casual, refined materials, elegant styling, 8k lifestyle photography, refined sportswear, commercial luxury",
+          "runwayPrompt": "Professional in premium football-inspired polo walking through luxury cafe, sophisticated casual movement, elegant ambient lighting, embroidery and fabric quality focus, cinematic upscale casual video"
+        },
+        "deconstructedAvantGarde": {
+          "name": "Deconstructed Avant-Garde",
+          "description": "Artistic reconstruction, fashion-forward styling",
+          "bestFor": "Experimental designs, high-fashion collections",
+          "replicatePrompt": "deconstructed football wear, artistic urban setting, avant-garde fashion, creative reconstruction, innovative design elements, conceptual styling, 8k editorial photography, wearable art, high fashion aesthetic",
+          "runwayPrompt": "Model in deconstructed football-inspired piece moving through artistic space, experimental fashion movement, dramatic editorial lighting, innovative construction details focus, cinematic avant-garde fashion video"
+        },
+        "techStreetwear": {
+          "name": "Tech Streetwear",
+          "description": "Technical fabrics, futuristic urban environments",
+          "bestFor": "Performance-inspired streetwear, modern designs",
+          "replicatePrompt": "technical football-inspired jacket, futuristic city setting, tech streetwear, innovative fabrics, performance materials, cyberpunk aesthetic, 8k sci-fi photography, urban futurism, commercial tech fashion",
+          "runwayPrompt": "Person in technical football-inspired wear moving through futuristic urban setting, tech-focused movement, neon and LED lighting, innovative fabric technology focus, cinematic cyberpunk streetwear video"
+        },
+        "weekendCasual": {
+          "name": "Weekend Casual",
+          "description": "Comfortable football sweaters, cozy settings",
+          "bestFor": "Loungewear, casual collections",
+          "replicatePrompt": "football-inspired sweater, cozy coffee shop, weekend casual wear, soft textures, comfortable styling, relaxed atmosphere, cozy materials, 8k lifestyle photography, relaxed aesthetic, commercial comfort wear",
+          "runwayPrompt": "Person in football-inspired sweater moving through cozy cafe space, relaxed casual movement, warm cozy lighting, soft texture and comfort details focus, cinematic weekend casual video"
+        }
+      }
+    },
+    "streetwear": {
+      "brandProfile": "Streetwear",
+      "scenarios": {
+        "urbanGraffiti": {
+          "name": "Urban Graffiti",
+          "description": "Street art backgrounds, edgy styling",
+          "bestFor": "Bold graphic designs, youth collections",
+          "replicatePrompt": "streetwear hoodie, graffiti alley setting, urban fashion, bold graphics, edgy styling, street art backdrop, rebellious aesthetic, 8k street photography, contemporary street culture, authentic urban vibe",
+          "runwayPrompt": "Streetwear model in graphic hoodie walking through graffiti alley, confident urban movement, dramatic street lighting, bold graphics and street art focus, cinematic street culture video"
+        },
+        "minimalistUrban": {
+          "name": "Minimalist Urban",
+          "description": "Clean architectural backgrounds, minimalist styling",
+          "bestFor": "Minimalist designs, premium basics",
+          "replicatePrompt": "minimalist streetwear, modern architectural setting, clean design, minimalist aesthetic, sophisticated urban, premium basics, architectural lines, 8k architectural photography, elevated streetwear, commercial minimalism",
+          "runwayPrompt": "Model in minimalist streetwear moving through modern architectural space, refined urban movement, clean architectural lighting, minimalist design details focus, cinematic sophisticated streetwear video"
+        },
+        "highFashionEditorial": {
+          "name": "High-Fashion Editorial",
+          "description": "Magazine-style shoots, dramatic lighting",
+          "bestFor": "Designer collections, runway pieces",
+          "replicatePrompt": "high-fashion streetwear, editorial studio setting, dramatic lighting, fashion-forward styling, luxury streetwear, conceptual design, 8k magazine photography, avant-garde urban, commercial high fashion",
+          "runwayPrompt": "Fashion model in designer streetwear piece moving through editorial studio, high-fashion movement, dramatic studio lighting, luxury design elements focus, cinematic high-fashion streetwear video"
+        },
+        "skateCulture": {
+          "name": "Skate Culture",
+          "description": "Skatepark environments, action shots",
+          "bestFor": "Skate-inspired wear, active streetwear",
+          "replicatePrompt": "skate streetwear, urban skatepark, action photography, dynamic movement, youth culture, authentic skate aesthetic, functional design, 8k documentary style, street sports culture, commercial skate fashion",
+          "runwayPrompt": "Skater in streetwear moving through skatepark environment, dynamic skate-inspired movement, raw urban lighting, functional design and movement focus, cinematic skate culture video"
+        },
+        "luxuryStreet": {
+          "name": "Luxury Street",
+          "description": "Upscale urban locations, premium styling",
+          "bestFor": "Luxury streetwear, high-end collections",
+          "replicatePrompt": "luxury streetwear, upscale rooftop setting, premium fabrics, sophisticated styling, elevated urban fashion, high-end materials, 8k luxury photography, commercial luxury streetwear, refined urban aesthetic",
+          "runwayPrompt": "Model in luxury streetwear on upscale rooftop, sophisticated urban movement, premium ambient lighting, luxury fabric and construction focus, cinematic high-end streetwear video"
+        }
+      }
+    },
+    "luxuryOldMoney": {
+      "brandProfile": "Luxury/Old Money",
+      "scenarios": {
+        "privateClubElegance": {
+          "name": "Private Club Elegance",
+          "description": "Members club interiors, refined atmosphere",
+          "bestFor": "Tailored suits, formal wear",
+          "replicatePrompt": "luxury suit, private club interior, elegant lighting, refined tailoring, sophisticated atmosphere, aristocratic setting, premium materials, 8k luxury photography, old money aesthetic, commercial formal wear",
+          "runwayPrompt": "Gentleman in tailored suit moving through private club, refined aristocratic movement, elegant club lighting, tailoring craftsmanship focus, cinematic old money elegance video"
+        },
+        "countryEstate": {
+          "name": "Country Estate",
+          "description": "Manor house settings, traditional elegance",
+          "bestFor": "Heritage collections, classic designs",
+          "replicatePrompt": "heritage tailoring, country estate setting, traditional elegance, timeless style, aristocratic atmosphere, classic materials, estate grounds, 8k period photography, heritage fashion, commercial traditional luxury",
+          "runwayPrompt": "Person in heritage clothing walking through country estate, traditional elegant movement, natural estate lighting, heritage craftsmanship focus, cinematic traditional luxury video"
+        },
+        "boardroomPower": {
+          "name": "Boardroom Power",
+          "description": "Executive office settings, professional authority",
+          "bestFor": "Business attire, power dressing",
+          "replicatePrompt": "executive suit, modern boardroom, professional setting, power dressing, authoritative style, corporate luxury, premium business wear, 8k corporate photography, executive presence, commercial business attire",
+          "runwayPrompt": "Executive in power suit moving through modern boardroom, confident authoritative movement, professional corporate lighting, suit construction and authority focus, cinematic executive fashion video"
+        },
+        "eveningSoiree": {
+          "name": "Evening Soirée",
+          "description": "Gala event settings, evening glamour",
+          "bestFor": "Evening wear, formal attire",
+          "replicatePrompt": "evening wear, gala event setting, glamorous lighting, sophisticated styling, black-tie elegance, formal luxury, evening sophistication, 8k event photography, formal glamour, commercial evening wear",
+          "runwayPrompt": "Person in evening wear moving through gala setting, sophisticated formal movement, glamorous event lighting, evening wear elegance focus, cinematic formal glamour video"
+        },
+        "yachtClub": {
+          "name": "Yacht Club",
+          "description": "Nautical settings, leisure luxury",
+          "bestFor": "Resort wear, leisure collections",
+          "replicatePrompt": "luxury leisure wear, yacht club setting, nautical aesthetic, relaxed elegance, premium casual, maritime luxury, sophisticated resort wear, 8k lifestyle photography, nautical luxury, commercial resort fashion",
+          "runwayPrompt": "Person in luxury leisure wear walking through yacht club, relaxed elegant movement, nautical ambient lighting, premium casual details focus, cinematic luxury leisure video"
+        }
+      }
+    },
+    "gymwear": {
+      "brandProfile": "Gymwear",
+      "scenarios": {
+        "performanceAction": {
+          "name": "Performance Action",
+          "description": "Gym action shots, dynamic movement",
+          "bestFor": "Performance activewear, training gear",
+          "replicatePrompt": "performance gym wear, modern gym setting, action photography, dynamic movement, sweat details, athletic performance, technical fabrics, 8k sports photography, fitness action, commercial activewear",
+          "runwayPrompt": "Athlete in performance wear training in gym, dynamic athletic movement, high-energy gym lighting, performance fabric technology focus, cinematic fitness action video"
+        },
+        "studioFitness": {
+          "name": "Studio Fitness",
+          "description": "Fitness studio, clean lines, yoga/pilates",
+          "bestFor": "Studio wear, yoga collections",
+          "replicatePrompt": "studio fitness wear, clean fitness studio, mindful movement, flexibility demonstration, zen atmosphere, yoga aesthetics, premium studio wear, 8k wellness photography, mindful fitness, commercial yoga wear",
+          "runwayPrompt": "Yoga practitioner in studio wear moving through poses, mindful flowing movement, soft studio lighting, flexibility and fabric stretch focus, cinematic wellness video"
+        },
+        "streetToGym": {
+          "name": "Street-to-Gym",
+          "description": "Urban to gym transition, versatile styling",
+          "bestFor": "Hybrid wear, athleisure",
+          "replicatePrompt": "athleisure wear, urban to gym transition, versatile styling, functional fashion, lifestyle integration, street-ready athletic wear, 8k lifestyle photography, athleisure lifestyle, commercial hybrid wear",
+          "runwayPrompt": "Person in athleisure transitioning from street to gym, versatile lifestyle movement, mixed urban/gym lighting, functional versatility focus, cinematic athleisure lifestyle video"
+        },
+        "outdoorTraining": {
+          "name": "Outdoor Training",
+          "description": "Outdoor fitness environments, natural settings",
+          "bestFor": "Outdoor training gear, trail wear",
+          "replicatePrompt": "outdoor gym wear, park training setting, natural environment, functional performance, outdoor fitness, weather-resistant materials, 8k outdoor photography, natural training, commercial outdoor activewear",
+          "runwayPrompt": "Athlete in outdoor gear training in park setting, natural athletic movement, outdoor natural lighting, weather-resistant fabric focus, cinematic outdoor fitness video"
+        },
+        "recoveryLounge": {
+          "name": "Recovery Lounge",
+          "description": "Post-workout settings, recovery focus",
+          "bestFor": "Recovery wear, comfort-focused designs",
+          "replicatePrompt": "recovery wear, spa lounge setting, comfort focus, relaxation atmosphere, wellness environment, post-workout comfort, soft recovery fabrics, 8k wellness photography, recovery comfort, commercial wellness wear",
+          "runwayPrompt": "Person in recovery wear relaxing in spa lounge, gentle recovery movement, soft wellness lighting, comfort and relaxation focus, cinematic recovery video"
+        }
+      }
+    },
+    "artisticCreative": {
+      "brandProfile": "Artistic/Creative",
+      "scenarios": {
+        "galleryExhibition": {
+          "name": "Gallery Exhibition",
+          "description": "Art gallery settings, creative atmosphere",
+          "bestFor": "Artistic collections, statement pieces",
+          "replicatePrompt": "artistic fashion, contemporary gallery setting, creative atmosphere, wearable art, gallery lighting, artistic expression, conceptual design, 8k artistic photography, creative fashion, commercial art wear",
+          "runwayPrompt": "Artist in conceptual fashion moving through gallery space, creative expressive movement, gallery exhibition lighting, artistic design elements focus, cinematic wearable art video"
+        },
+        "studioCreative": {
+          "name": "Studio Creative",
+          "description": "Artist studio environments, creative process",
+          "bestFor": "Handmade designs, artisanal collections",
+          "replicatePrompt": "artisanal fashion, creative studio setting, handmade details, artistic process, craftsman workspace, handcrafted elements, 8k documentary photography, artisan fashion, commercial handmade wear",
+          "runwayPrompt": "Artisan in handmade fashion working in studio, creative crafting movement, natural studio lighting, handmade craftsmanship focus, cinematic artisan process video"
+        },
+        "digitalArt": {
+          "name": "Digital Art",
+          "description": "Digital/tech environments, futuristic aesthetic",
+          "bestFor": "Digital print designs, tech-inspired wear",
+          "replicatePrompt": "digital fashion, tech environment setting, futuristic aesthetic, innovative design, digital patterns, cyberpunk elements, 8k cyber photography, tech fashion, commercial digital wear",
+          "runwayPrompt": "Model in digital fashion moving through tech environment, futuristic tech movement, neon digital lighting, digital pattern technology focus, cinematic cyber fashion video"
+        },
+        "sustainableCraft": {
+          "name": "Sustainable Craft",
+          "description": "Eco-friendly settings, craft emphasis",
+          "bestFor": "Sustainable collections, ethical fashion",
+          "replicatePrompt": "sustainable fashion, eco-conscious setting, craft details, ethical production, natural materials, environmental awareness, 8k documentary style, eco fashion, commercial sustainable wear",
+          "runwayPrompt": "Person in sustainable fashion in eco-friendly setting, conscious mindful movement, natural eco lighting, sustainable material focus, cinematic eco-conscious fashion video"
+        },
+        "performanceArt": {
+          "name": "Performance Art",
+          "description": "Theater/stage settings, dramatic expression",
+          "bestFor": "Statement pieces, performance wear",
+          "replicatePrompt": "performance fashion, theatrical setting, dramatic expression, artistic movement, stage presence, theatrical design, 8k stage photography, performance wear, commercial theatrical fashion",
+          "runwayPrompt": "Performer in theatrical fashion on stage, dramatic expressive movement, theatrical stage lighting, performance design elements focus, cinematic performance art video"
+        }
+      }
+    },
+    "ecommerce": {
+      "brandProfile": "E-commerce",
+      "scenarios": {
+        "whiteBackgroundProduct": {
+          "name": "White Background Product",
+          "description": "Clean studio, product-focused",
+          "bestFor": "E-commerce listings, product shots",
+          "replicatePrompt": "product photography, white studio background, clean lighting, detailed product focus, commercial quality, pristine presentation, sharp details, 8k commercial photography, e-commerce ready, professional product shot",
+          "runwayPrompt": "Model showcasing product on white background, clean product-focused movement, professional studio lighting, product details and fit focus, cinematic commercial product video"
+        },
+        "flatLayStyle": {
+          "name": "Flat Lay Style",
+          "description": "Overhead shots, styled arrangements",
+          "bestFor": "Social media, catalog shots",
+          "replicatePrompt": "flat lay photography, styled arrangement, overhead angle, product details, social media ready, styled composition, 8k commercial styling, catalog presentation, lifestyle arrangement",
+          "runwayPrompt": "Overhead view of styled product arrangement, organized layout movement, flat lay lighting setup, product styling and details focus, cinematic flat lay video"
+        },
+        "modelRotation": {
+          "name": "Model Rotation",
+          "description": "Multiple angles on model, 360° view",
+          "bestFor": "Online shopping, detailed views",
+          "replicatePrompt": "model rotation photography, multiple angles, detailed product views, 360-degree showcase, comprehensive product display, 8k commercial photography, online shopping ready, detailed product presentation",
+          "runwayPrompt": "Model rotating to show product from all angles, systematic rotation movement, even commercial lighting, comprehensive product view focus, cinematic 360-degree showcase video"
+        },
+        "detailCloseUps": {
+          "name": "Detail Close-ups",
+          "description": "Extreme close-ups, texture focus",
+          "bestFor": "Quality demonstration, fabric details",
+          "replicatePrompt": "detail photography, extreme close-ups, texture focus, craftsmanship details, material quality, construction elements, 8k macro photography, quality demonstration, commercial detail shots",
+          "runwayPrompt": "Extreme close-up views of product details, detailed examination movement, macro detail lighting, texture and craftsmanship focus, cinematic detail showcase video"
+        },
+        "sizeColorVariations": {
+          "name": "Size/Color Variations",
+          "description": "Comparison shots, option displays",
+          "bestFor": "Product variations, choice presentation",
+          "replicatePrompt": "variation photography, comparison display, color options, size variations, product range showcase, systematic presentation, 8k commercial photography, choice demonstration, variant display",
+          "runwayPrompt": "Display of product variations and options, comparative showcase movement, clear comparison lighting, variation options focus, cinematic product range video"
+        }
+      }
+    },
+    "cinematic": {
+      "brandProfile": "Cinematic",
+      "scenarios": {
+        "filmNoir": {
+          "name": "Film Noir",
+          "description": "Dramatic shadows, moody atmosphere",
+          "bestFor": "Dramatic designs, evening collections",
+          "replicatePrompt": "film noir fashion, dramatic lighting, moody atmosphere, cinematic shadows, noir aesthetic, high contrast, dramatic styling, 8k noir photography, mysterious elegance, commercial dramatic fashion",
+          "runwayPrompt": "Model in noir-style fashion moving through dramatic shadows, mysterious film movement, dramatic noir lighting, shadow and silhouette focus, cinematic film noir fashion video"
+        },
+        "goldenHour": {
+          "name": "Golden Hour",
+          "description": "Sunset lighting, warm tones",
+          "bestFor": "Casual wear, lifestyle collections",
+          "replicatePrompt": "golden hour fashion, sunset lighting, warm tones, romantic atmosphere, soft golden light, dreamy aesthetic, lifestyle elegance, 8k cinematic photography, golden hour beauty, commercial lifestyle fashion",
+          "runwayPrompt": "Person in casual fashion during golden hour, romantic dreamy movement, warm sunset lighting, golden hour atmosphere focus, cinematic sunset fashion video"
+        },
+        "sciFiFuturism": {
+          "name": "Sci-Fi Futurism",
+          "description": "Futuristic lighting, tech environments",
+          "bestFor": "Modern designs, tech collections",
+          "replicatePrompt": "sci-fi fashion, futuristic setting, neon lighting, tech aesthetic, cyberpunk atmosphere, futuristic design elements, 8k cyberpunk photography, tech fashion, commercial sci-fi wear",
+          "runwayPrompt": "Model in futuristic fashion in sci-fi environment, tech-enhanced movement, neon cyberpunk lighting, futuristic design focus, cinematic sci-fi fashion video"
+        },
+        "periodDrama": {
+          "name": "Period Drama",
+          "description": "Historical settings, period accuracy",
+          "bestFor": "Vintage-inspired, heritage collections",
+          "replicatePrompt": "period fashion, historical setting, era-accurate details, timeless elegance, vintage atmosphere, historical authenticity, 8k period photography, heritage fashion, commercial period wear",
+          "runwayPrompt": "Person in period-inspired fashion in historical setting, era-appropriate movement, period-accurate lighting, historical detail focus, cinematic period drama video"
+        },
+        "documentaryRealism": {
+          "name": "Documentary Realism",
+          "description": "Natural lighting, authentic settings",
+          "bestFor": "Authentic brands, story-focused collections",
+          "replicatePrompt": "documentary fashion, authentic setting, natural lighting, real-life context, honest presentation, lifestyle authenticity, 8k documentary photography, real-world fashion, commercial authentic wear",
+          "runwayPrompt": "Person in authentic fashion in real-world setting, natural genuine movement, documentary-style lighting, authentic lifestyle focus, cinematic documentary fashion video"
+        }
+      }
+    },
+    "lifestyle": {
+      "brandProfile": "Lifestyle",
+      "scenarios": {
+        "urbanExplorer": {
+          "name": "Urban Explorer",
+          "description": "City exploration, travel context",
+          "bestFor": "Travel wear, versatile designs",
+          "replicatePrompt": "urban explorer fashion, city travel setting, functional styling, adventure context, travel-ready design, urban exploration, 8k travel photography, adventure fashion, commercial travel wear",
+          "runwayPrompt": "Urban explorer in travel fashion navigating city streets, adventurous exploration movement, dynamic city lighting, functional travel design focus, cinematic urban exploration video"
+        },
+        "coffeeCulture": {
+          "name": "Coffee Culture",
+          "description": "Cafe settings, relaxed atmosphere",
+          "bestFor": "Casual wear, everyday collections",
+          "replicatePrompt": "coffee culture fashion, urban cafe setting, relaxed atmosphere, everyday style, casual elegance, coffee shop ambiance, 8k lifestyle photography, cafe fashion, commercial casual wear",
+          "runwayPrompt": "Person in casual fashion enjoying cafe atmosphere, relaxed social movement, warm cafe lighting, everyday style focus, cinematic coffee culture video"
+        },
+        "creativeWorkspace": {
+          "name": "Creative Workspace",
+          "description": "Creative office environments",
+          "bestFor": "Workwear, creative professional attire",
+          "replicatePrompt": "creative workwear, modern office setting, professional creativity, work-life style, creative professional atmosphere, innovative workspace, 8k workspace photography, creative fashion, commercial work attire",
+          "runwayPrompt": "Creative professional in work fashion in modern office, productive creative movement, inspiring workspace lighting, professional creativity focus, cinematic creative workspace video"
+        },
+        "weekendGetaway": {
+          "name": "Weekend Getaway",
+          "description": "Vacation settings, leisure focus",
+          "bestFor": "Resort wear, vacation collections",
+          "replicatePrompt": "weekend getaway fashion, vacation setting, leisure style, relaxed elegance, vacation atmosphere, resort elegance, 8k travel photography, vacation fashion, commercial resort wear",
+          "runwayPrompt": "Person in vacation fashion on weekend getaway, relaxed vacation movement, leisure vacation lighting, resort style focus, cinematic vacation fashion video"
+        },
+        "nightOut": {
+          "name": "Night Out",
+          "description": "Evening venues, nightlife settings",
+          "bestFor": "Evening wear, going-out collections",
+          "replicatePrompt": "night out fashion, evening venue setting, nightlife atmosphere, stylish evening wear, night scene elegance, urban nightlife, 8k night photography, evening fashion, commercial nightlife wear",
+          "runwayPrompt": "Person in evening fashion at nightlife venue, confident night-out movement, dynamic nightlife lighting, evening style focus, cinematic nightlife fashion video"
+        }
+      }
+    }
+  },
+  "promptEnhancements": {
+    "replicateBasics": {
+      "cameraSettings": "8k photorealistic, commercial photography, sharp focus, detailed textures",
+      "lightingKeywords": "professional lighting, cinematic quality, color grading, high dynamic range",
+      "compositionElements": "rule of thirds, dynamic composition, depth of field, visual hierarchy",
+      "qualityModifiers": "ultra-detailed, high resolution, premium commercial quality, fashion photography standard"
+    },
+    "runwayBasics": {
+      "movementQuality": "cinematic video, smooth motion, professional cinematography, dynamic camera work",
+      "lightingForVideo": "cinematic lighting, color temperature balance, consistent exposure, video-optimized",
+      "focusElements": "depth of field video, focus tracking, visual storytelling, commercial video quality",
+      "productionValue": "broadcast quality, professional production, commercial video standard, high-end cinematography"
+    },
+    "brandSpecificEnhancements": {
+      "medicalWear": "clinical precision, healthcare professional standards, sterile environment authenticity",
+      "streetwear": "urban authenticity, street culture accuracy, contemporary fashion relevance",
+      "luxury": "premium material showcase, aristocratic elegance, sophisticated craftsmanship",
+      "athletic": "performance functionality display, athletic movement accuracy, technical fabric showcase",
+      "artistic": "creative expression emphasis, conceptual design highlighting, artistic vision showcase"
+    }
+  },
+  "customizationOptions": {
+    "seasonalAdaptations": {
+      "spring": "fresh lighting, renewal themes, light fabrics, pastel color palettes",
+      "summer": "bright sunny lighting, vacation vibes, lightweight materials, vibrant colors",
+      "fall": "warm golden lighting, cozy atmospheres, layering showcase, earth tones",
+      "winter": "crisp lighting, luxury textures, warming elements, rich deep colors"
+    },
+    "timeOfDayMods": {
+      "morning": "soft dawn lighting, fresh energy, new day aesthetics",
+      "midday": "bright clear lighting, professional energy, active lifestyle",
+      "evening": "warm golden lighting, sophisticated atmosphere, leisure elegance",
+      "night": "dramatic lighting, mystery elements, evening sophistication"
+    },
+    "demographicTargeting": {
+      "youngAdult": "trendy environments, social media aesthetics, contemporary styling",
+      "professional": "corporate settings, refined atmospheres, business-appropriate contexts",
+      "luxury": "upscale environments, premium settings, sophisticated presentations",
+      "athletic": "performance contexts, active environments, functionality focus"
+    }
+  },
+  "technicalSpecifications": {
+    "imageRequirements": {
+      "resolution": "8K minimum (7680×4320)",
+      "aspectRatio": "Multiple ratios supported: 16:9, 4:3, 1:1, 9:16",
+      "colorSpace": "sRGB for web, Adobe RGB for print",
+      "fileFormat": "High-quality JPEG or PNG for final delivery"
+    },
+    "videoRequirements": {
+      "resolution": "4K minimum (3840×2160)",
+      "frameRate": "24fps for cinematic, 30fps for commercial, 60fps for dynamic action",
+      "duration": "15-30 seconds optimal for social media, 60 seconds for detailed showcase",
+      "codecRecommendation": "H.264 for compatibility, H.265 for quality"
+    }
+  }
+}
