@@ -342,7 +342,7 @@ export async function generatePromptWithAI(input: PromptGenerationInput): Promis
       // Strip any labels/preamble LLaVA might add
       visionResult = visionResult
         .replace(/^(The |This |It's a |Here is |Description:?\s*)/i, '')
-        .replace(/\n.*/s, '') // Only take first line
+        .replace(/\n[\s\S]*/, '') // Only take first line
         .trim()
 
       // Detect degeneration
