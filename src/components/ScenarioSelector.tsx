@@ -131,7 +131,7 @@ const cinematicIntelligenceOptions = [
   { value: 'epicCampaign', label: 'Epic Campaign', description: 'Sweeping, aspirational' }
 ];
 
-const API_URL = import.meta.env.DEV ? '/api' : 'https://shootly-d3yy.vercel.app/api';
+const API_URL = import.meta.env.DEV ? '/api' : 'https://youssefmoh222222-shootly.vercel.app/api';
 
 // Derive a category from vibe when the brand has no explicit category
 const vibeToCategory: Record<string, string> = {
