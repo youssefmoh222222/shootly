@@ -6,10 +6,11 @@ import { GenerationProgress } from './components/GenerationProgress.tsx';
 import { ResultsScreen } from './components/ResultsScreen.tsx';
 import { Auth } from './components/Auth.tsx';
 import { LandingPage } from './components/LandingPage.tsx';
+import { PricingPage } from './components/PricingPage.tsx';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Backend API URL - Dev uses Vite proxy (/api → localhost:3001), prod hits Vercel directly
-const API_URL = import.meta.env.DEV ? '/api' : 'https://youssefmoh222222-shootly.vercel.app/api'
+const API_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'https://shootly-z6o8.vercel.app/api')
 
 // Log the API URL for debugging
 console.log('API_URL:', API_URL);
@@ -54,24 +55,26 @@ export type DesignData = {
   generateForAll?: boolean;
 };
 
-export type View = 'landing' | 'auth' | 'dashboard' | 'brand-wizard' | 'design-upload' | 'generating' | 'results';
+export type View = 'landing' | 'auth' | 'pricing' | 'dashboard' | 'brand-wizard' | 'design-upload' | 'generating' | 'results';
 
 // localStorage keys
 const STORAGE_KEYS = {
   IS_AUTHENTICATED: 'ai_clothing_studio_authenticated',
   AUTH_TOKEN: 'ai_clothing_studio_token',
+  REMEMBER_ME: 'ai_clothing_studio_remember_me',
 };
 
-// Helper to get auth headers
+// Helper to get auth headers (checks both storages)
 const getAuthHeaders = (): Record<string, string> => {
-  let token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-  
+  let token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    || sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+
   // Handle case where token is the literal string "null" or "undefined"
   if (!token || token === 'null' || token === 'undefined') {
-    console.log('App - No valid token found in localStorage');
+    console.log('App - No valid token found in storage');
     return {};
   }
-  
+
   console.log('App - Token found:', token.substring(0, 20) + '...');
   return { 'Authorization': `Bearer ${token}` };
 };
@@ -113,16 +116,44 @@ function App() {
   const [currentDesign, setCurrentDesign] = useState<DesignData | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
 
-  // Check authentication status on mount
+  // Check authentication status on mount and validate token
   useEffect(() => {
-    const checkAuth = () => {
-      const storedAuth = localStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED);
-      const authenticated = storedAuth === 'true';
-      setIsAuthenticated(authenticated);
+    const checkAuth = async () => {
+      const rememberMe = localStorage.getItem(STORAGE_KEYS.REMEMBER_ME);
+      const storage = rememberMe === 'false' ? sessionStorage : localStorage;
+      const storedAuth = storage.getItem(STORAGE_KEYS.IS_AUTHENTICATED);
+      const token = storage.getItem(STORAGE_KEYS.AUTH_TOKEN);
 
-      if (authenticated) {
-        setCurrentView('dashboard');
+      if (storedAuth === 'true' && token && token !== 'null' && token !== 'undefined') {
+        try {
+          // Validate token by calling the credits endpoint
+          const response = await fetch(`${API_URL}/credits`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setIsAuthenticated(true);
+            setCredits(data.credits);
+            setCurrentView('dashboard');
+          } else {
+            // Token is invalid/expired — clear everything
+            localStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
+            localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+            sessionStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
+            sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          }
+        } catch {
+          // Network error — allow access with stored token
+          setIsAuthenticated(true);
+          setCurrentView('dashboard');
+        }
       }
+
       setIsLoading(false);
     };
 
@@ -144,8 +175,9 @@ function App() {
 
   const fetchBrandsFromAPI = async () => {
     try {
-      let token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-      
+      let token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+        || sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+
       // Handle case where token is the literal string "null" or "undefined"
       if (!token || token === 'null' || token === 'undefined') {
         console.log('App - fetchBrandsFromAPI: No valid token found');
@@ -259,23 +291,42 @@ function App() {
     return vibeMap[vibe] || 'STREETWEAR';
   };
 
-  const handleAuthenticated = (creditsFromAuth?: number) => {
+  const handleAuthenticated = (creditsFromAuth?: number, rememberMe: boolean = true, token?: string) => {
+    const storage = rememberMe ? localStorage : sessionStorage;
+
+    if (token) {
+      storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+    }
+    storage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
+    localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, String(rememberMe));
+
     setIsAuthenticated(true);
-    localStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
     if (creditsFromAuth !== undefined) setCredits(creditsFromAuth);
     setCurrentView('dashboard');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    // Clear both storages
     localStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+    sessionStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
+    sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     setBrands(defaultBrands);
     setSelectedBrand(null);
     setCurrentView('landing');
   };
 
-  const handleSignupComplete = (creditsFromAuth?: number) => {
+  const handleSignupComplete = (creditsFromAuth?: number, token?: string) => {
+    // Sign-up always remembers (localStorage)
+    if (token) {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+    }
+    localStorage.setItem(STORAGE_KEYS.IS_AUTHENTICATED, 'true');
+    localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, 'true');
+
+    setIsAuthenticated(true);
     if (creditsFromAuth !== undefined) setCredits(creditsFromAuth);
     setCurrentView('brand-wizard');
   };
@@ -639,12 +690,8 @@ function App() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-black mb-8">
-            <motion.div
-              className="w-10 h-10 border-2 border-white border-t-transparent rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-8">
+            <img src="/logo-new.png" alt="Shootly" className="w-20 h-20" />
           </div>
           <p className="text-neutral-500">Loading...</p>
         </div>
@@ -667,6 +714,23 @@ function App() {
             <LandingPage
               onGetStarted={() => setCurrentView('auth')}
               onSignIn={() => setCurrentView('auth')}
+              onViewPricing={() => setCurrentView('pricing')}
+            />
+          </motion.div>
+        )}
+
+        {currentView === 'pricing' && (
+          <motion.div
+            key="pricing"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <PricingPage
+              onGetStarted={() => setCurrentView('auth')}
+              onBack={() => setCurrentView('landing')}
             />
           </motion.div>
         )}
@@ -684,6 +748,7 @@ function App() {
               onAuthenticated={handleAuthenticated}
               onSignupComplete={handleSignupComplete}
               apiUrl={API_URL}
+              onBack={() => setCurrentView('landing')}
             />
           </motion.div>
         )}
@@ -707,6 +772,7 @@ function App() {
               onEditBrand={handleEditBrand}
               onDeleteBrand={handleDeleteBrand}
               onLogout={handleLogout}
+              onBack={() => setCurrentView('landing')}
             />
           </motion.div>
         )}

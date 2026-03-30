@@ -165,7 +165,7 @@ export function PricingPage({ onGetStarted, onBack }: PricingPageProps) {
   const EARLY_ADOPTER_LIMIT = 20;
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_API_URL || 'https://shootly-i1im.vercel.app';
+    const backendUrl = import.meta.env.VITE_API_URL || 'https://shootly-z6o8.vercel.app';
     fetch(`${backendUrl}/api/stats`)
       .then((r) => r.json())
       .then((data) => setSignupCount(data.signupCount ?? 0))
