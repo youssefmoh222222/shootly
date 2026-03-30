@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowRight,
@@ -160,6 +160,20 @@ const faqs = [
 export function PricingPage({ onGetStarted, onBack }: PricingPageProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isAnnual, setIsAnnual] = useState(false);
+  const [signupCount, setSignupCount] = useState<number | null>(null);
+
+  const EARLY_ADOPTER_LIMIT = 20;
+
+  useEffect(() => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://youssefmoh222222-shootly.vercel.app';
+    fetch(`${backendUrl}/api/stats`)
+      .then((r) => r.json())
+      .then((data) => setSignupCount(data.signupCount ?? 0))
+      .catch(() => setSignupCount(0));
+  }, []);
+
+  const spotsLeft = signupCount === null ? null : Math.max(0, EARLY_ADOPTER_LIMIT - signupCount);
+  const isFull = signupCount !== null && signupCount >= EARLY_ADOPTER_LIMIT;
 
   const getPrice = (monthly: string) => {
     if (!isAnnual || monthly === '$0') return monthly;
@@ -208,45 +222,78 @@ export function PricingPage({ onGetStarted, onBack }: PricingPageProps) {
             <motion.div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-6"
               style={{
-                backgroundColor: 'rgba(245,158,11,0.15)',
-                color: '#fbbf24',
-                border: '1px solid rgba(245,158,11,0.25)',
+                backgroundColor: isFull ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)',
+                color: isFull ? '#f87171' : '#fbbf24',
+                border: `1px solid ${isFull ? 'rgba(239,68,68,0.25)' : 'rgba(245,158,11,0.25)'}`,
               }}
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Gift className="w-4 h-4" />
-              Limited — only 20 spots
+              {isFull ? 'Early-adopter spots are full' : 'Limited — only 20 spots'}
             </motion.div>
 
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              First 20 signups get<br />
-              <span style={{ color: '#fbbf24' }}>20 credits free</span>
+              {isFull ? (
+                <>All early-adopter<br />spots are claimed</>
+              ) : (
+                <>First 20 signups get<br /><span style={{ color: '#fbbf24' }}>20 credits free</span></>
+              )}
             </h2>
 
+            {/* Live counter */}
+            <div className="mb-6">
+              {signupCount === null ? (
+                <div className="h-2 w-48 mx-auto rounded-full bg-white/10 animate-pulse" />
+              ) : (
+                <>
+                  <div className="flex items-center justify-between text-sm mb-2 max-w-xs mx-auto">
+                    <span style={{ color: '#a3a3a3' }}>
+                      {signupCount} of {EARLY_ADOPTER_LIMIT} spots claimed
+                    </span>
+                    <span style={{ color: isFull ? '#f87171' : '#fbbf24' }} className="font-semibold">
+                      {isFull ? 'Full' : `${spotsLeft} left`}
+                    </span>
+                  </div>
+                  <div className="w-full max-w-xs mx-auto h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    <motion.div
+                      className="h-2 rounded-full"
+                      style={{ backgroundColor: isFull ? '#f87171' : '#fbbf24' }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(100, (signupCount / EARLY_ADOPTER_LIMIT) * 100)}%` }}
+                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
             <p className="mb-8 max-w-sm mx-auto leading-relaxed" style={{ color: '#a3a3a3' }}>
-              Be an early adopter and get enough credits to create cinematic
-              images and videos — completely free. No credit card required.
+              {isFull
+                ? 'The early-adopter offer is over, but you can still sign up and explore the platform.'
+                : 'Be an early adopter and get enough credits to create cinematic images and videos — completely free. No credit card required.'}
             </p>
 
-            {/* Credit breakdown */}
-            <div className="grid grid-cols-2 gap-3 mb-8 text-left">
-              {[
-                { label: '~10 cinematic images', icon: '📸' },
-                { label: '2 cinematic videos', icon: '🎬' },
-                { label: 'All brand categories', icon: '✅' },
-                { label: 'No credit card needed', icon: '🔓' },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center gap-2 text-sm rounded-xl px-3 py-2"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.07)' }}
-                >
-                  <span>{item.icon}</span>
-                  <span style={{ color: '#d4d4d4' }}>{item.label}</span>
-                </div>
-              ))}
-            </div>
+            {/* Credit breakdown — only show when spots available */}
+            {!isFull && (
+              <div className="grid grid-cols-2 gap-3 mb-8 text-left">
+                {[
+                  { label: '~10 cinematic images', icon: '📸' },
+                  { label: '2 cinematic videos', icon: '🎬' },
+                  { label: 'All brand categories', icon: '✅' },
+                  { label: 'No credit card needed', icon: '🔓' },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-2 text-sm rounded-xl px-3 py-2"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.07)' }}
+                  >
+                    <span>{item.icon}</span>
+                    <span style={{ color: '#d4d4d4' }}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <motion.button
               onClick={onGetStarted}
@@ -256,7 +303,7 @@ export function PricingPage({ onGetStarted, onBack }: PricingPageProps) {
               whileTap={{ scale: 0.98 }}
             >
               <Sparkles className="w-5 h-5" />
-              Claim Your 20 Free Credits
+              {isFull ? 'Sign Up Free' : 'Claim Your 20 Free Credits'}
               <ArrowRight className="w-5 h-5" />
             </motion.button>
 
