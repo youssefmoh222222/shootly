@@ -80,52 +80,54 @@ export function buildPrompt(context: PromptContext & { mode?: 'standard' | 'cine
   }
 }
 
+const DESIGN_PRESERVATION = 'Use the reference image EXACTLY as provided. Do NOT modify, redesign, or alter the jersey in any way. The jersey design, color, pattern, logos, and text must remain 100% identical to the reference image.'
+
 function enhanceCustomPrompt(customPrompt: string, context: PromptContext): string {
   const { brandTone, targetAudience, environment } = context
-  
-  return `Professional ${brandTone.toLowerCase()} clothing design for ${targetAudience.toLowerCase()} in ${environment.toLowerCase()} setting. ${customPrompt} High quality, photorealistic, detailed fabric texture, perfect lighting, professional photography.`
+
+  return `${DESIGN_PRESERVATION} Professional ${brandTone.toLowerCase()} clothing design for ${targetAudience.toLowerCase()} in ${environment.toLowerCase()} setting. ${customPrompt} High quality, photorealistic, detailed fabric texture, perfect lighting, professional photography.`
 }
 
 function buildMedicalPrompt(context: PromptContext): string {
   const { brandTone, targetAudience, primaryColor, secondaryColor } = context
   const colors = [primaryColor, secondaryColor].filter(Boolean).join(' and ') || 'white and blue'
   
-  return `Professional medical wear clothing design, ${brandTone.toLowerCase()} style, for ${targetAudience.toLowerCase()}. Clean, hygienic appearance. Colors: ${colors}. High quality scrubs, comfortable fabric, detailed stitching, professional healthcare attire. Photorealistic, perfect lighting, commercial photography.`
+  return `${DESIGN_PRESERVATION} Professional medical wear clothing design, ${brandTone.toLowerCase()} style, for ${targetAudience.toLowerCase()}. Clean, hygienic appearance. Colors: ${colors}. High quality scrubs, comfortable fabric, detailed stitching, professional healthcare attire. Photorealistic, perfect lighting, commercial photography.`
 }
 
 function buildFootballPrompt(context: PromptContext): string {
   const { brandTone, targetAudience, primaryColor, secondaryColor } = context
   const colors = [primaryColor, secondaryColor].filter(Boolean).join(' and ') || 'team colors'
   
-  return `Professional football kit design, ${brandTone.toLowerCase()} style, for ${targetAudience.toLowerCase()}. Athletic sportswear, performance fabric, team colors ${colors}. Dynamic motion, detailed jersey with sponsor logos, matching shorts. Photorealistic, perfect lighting, commercial sports photography.`
+  return `${DESIGN_PRESERVATION} Professional football kit design, ${brandTone.toLowerCase()} style, for ${targetAudience.toLowerCase()}. Athletic sportswear, performance fabric, team colors ${colors}. Dynamic motion, detailed jersey with sponsor logos, matching shorts. Photorealistic, perfect lighting, commercial sports photography.`
 }
 
 function buildGymwearPrompt(context: PromptContext): string {
   const { brandTone, targetAudience, primaryColor, secondaryColor } = context
   const colors = [primaryColor, secondaryColor].filter(Boolean).join(' and ') || 'black and neon'
   
-  return `Premium gymwear fitness clothing design, ${brandTone.toLowerCase()} style, for ${targetAudience.toLowerCase()}. Athletic performance wear, stretch fabric, colors: ${colors}. Detailed athletic wear with Technical specifications, moisture-wicking material, comfortable fit. Photorealistic, perfect lighting, commercial fitness photography.`
+  return `${DESIGN_PRESERVATION} Premium gymwear fitness clothing design, ${brandTone.toLowerCase()} style, for ${targetAudience.toLowerCase()}. Athletic performance wear, stretch fabric, colors: ${colors}. Detailed athletic wear with Technical specifications, moisture-wicking material, comfortable fit. Photorealistic, perfect lighting, commercial fitness photography.`
 }
 
 function buildStreetwearPrompt(context: PromptContext): string {
   const { brandTone, targetAudience, primaryColor, secondaryColor } = context
   const colors = [primaryColor, secondaryColor].filter(Boolean).join(' and ') || 'urban colors'
   
-  return `Modern streetwear fashion design, ${brandTone.toLowerCase()} urban style, for ${targetAudience.toLowerCase()}. Contemporary clothing, street fashion aesthetic, colors: ${colors}. Oversized fit, graphic prints, detailed urban wear. Photorealistic, perfect lighting, editorial fashion photography.`
+  return `${DESIGN_PRESERVATION} Modern streetwear fashion design, ${brandTone.toLowerCase()} urban style, for ${targetAudience.toLowerCase()}. Contemporary clothing, street fashion aesthetic, colors: ${colors}. Oversized fit, graphic prints, detailed urban wear. Photorealistic, perfect lighting, editorial fashion photography.`
 }
 
 function buildOldMoneyPrompt(context: PromptContext): string {
   const { brandTone, targetAudience, primaryColor, secondaryColor } = context
   const colors = [primaryColor, secondaryColor].filter(Boolean).join(' and ') || 'classic neutral'
   
-  return `Classic old money preppy fashion design, ${brandTone.toLowerCase()} refined style, for ${targetAudience.toLowerCase()}. Traditional elegance, timeless pieces, colors: ${colors}. Quality materials, tailored fit, sophisticated wardrobe essentials. Photorealistic, perfect lighting, luxury lifestyle photography.`
+  return `${DESIGN_PRESERVATION} Classic old money preppy fashion design, ${brandTone.toLowerCase()} refined style, for ${targetAudience.toLowerCase()}. Traditional elegance, timeless pieces, colors: ${colors}. Quality materials, tailored fit, sophisticated wardrobe essentials. Photorealistic, perfect lighting, luxury lifestyle photography.`
 }
 
 function buildGenericPrompt(context: PromptContext): string {
   const { brandTone, targetAudience, environment, primaryColor, secondaryColor } = context
   const colors = [primaryColor, secondaryColor].filter(Boolean).join(' and ') || 'complementary colors'
 
-  return `Professional ${brandTone.toLowerCase()} clothing design for ${targetAudience.toLowerCase()} suitable for ${environment.toLowerCase()} settings. Colors: ${colors}. High quality fashion, detailed fabric texture, perfect lighting, commercial photography.`
+  return `${DESIGN_PRESERVATION} Professional ${brandTone.toLowerCase()} clothing design for ${targetAudience.toLowerCase()} suitable for ${environment.toLowerCase()} settings. Colors: ${colors}. High quality fashion, detailed fabric texture, perfect lighting, commercial photography.`
 }
 
 // ─── Product Showcase Prompt Builder ─────────────────────────────────
@@ -151,14 +153,14 @@ const CATEGORY_PRODUCT_VIBES: Record<string, string> = {
 
 const PRODUCT_ANIMATION_PROMPTS: Record<ProductAnimation, (hasBack: boolean) => string> = {
   rotation: (hasBack) => hasBack
-    ? 'Garment slowly rotates from front view to back view in one smooth steady turn. The clothing piece turns naturally on an invisible mannequin, transitioning from the front design to the back design. Single clean 180-degree rotation, no wobble, no bounce. All prints, graphics, colors stay EXACTLY as shown — zero changes.'
-    : 'Garment slowly rotates from front view turning to reveal the side and back in one smooth steady 180-degree turn. The clothing piece turns naturally on an invisible mannequin. Single clean rotation, no wobble, no bounce. All prints, graphics, colors stay EXACTLY as shown — zero changes.',
+    ? 'Garment slowly rotates from front view to back view in one smooth steady turn. The clothing piece turns naturally on an invisible mannequin, transitioning from the front design to the back design. Single clean 180-degree rotation, no wobble, no bounce. All logos, text, prints, graphics, and colors must remain perfectly sharp and undistorted throughout — zero changes, no smearing, no warping.'
+    : 'Garment slowly rotates from front view turning to reveal the side and back in one smooth steady 180-degree turn. The clothing piece turns naturally on an invisible mannequin. Single clean rotation, no wobble, no bounce. All logos, text, prints, graphics, and colors must remain perfectly sharp and undistorted throughout — zero changes, no smearing, no warping.',
   closeup: (_hasBack) =>
-    'Slow cinematic macro close-up gliding across the garment surface, revealing fabric weave, stitching quality, print detail, and material texture. Shallow depth of field, 100mm macro lens feel. Every print, graphic, and color stays EXACTLY as the original — zero changes.',
+    'Slow cinematic macro close-up gliding across the garment surface, revealing fabric weave, stitching quality, print detail, logo sharpness, and material texture. Shallow depth of field, 100mm macro lens feel. Every logo, text, print, graphic, and color stays EXACTLY as the original — zero changes, no distortion.',
   pan: (_hasBack) =>
-    'Elegant smooth top-to-bottom camera pan revealing the complete garment from neckline down to hem. Full design visible, steady slow vertical tracking shot. All prints, graphics, colors, and construction details remain EXACTLY as shown — zero changes.',
+    'Elegant smooth top-to-bottom camera pan revealing the complete garment from neckline down to hem. Full design visible, steady slow vertical tracking shot. All logos, text, prints, graphics, colors, and construction details remain EXACTLY as shown — zero changes, no warping.',
   lifestyle: (_hasBack) =>
-    'The garment displayed in a curated styled setting with very gentle subtle fabric movement from a light breeze. Warm natural side lighting, shallow depth of field, editorial product photography mood. The garment design, prints, and colors stay EXACTLY as the original — zero changes.',
+    'The garment displayed in a curated styled setting with very gentle subtle fabric movement from a light breeze. Warm natural side lighting, shallow depth of field, editorial product photography mood. All logos, text, prints, graphics, and colors stay EXACTLY as the original — zero changes, no distortion.',
 }
 
 export function buildProductShowcasePrompt(
@@ -168,6 +170,9 @@ export function buildProductShowcasePrompt(
   hasBackImage?: boolean,
 ): string {
   const parts: string[] = []
+
+  // Design preservation mandate
+  parts.push('Use the reference image EXACTLY as provided. Do NOT modify, redesign, or alter the jersey in any way. The jersey design, color, pattern, logos, and text must remain 100% identical to the reference image')
 
   // Animation-specific motion description
   parts.push(PRODUCT_ANIMATION_PROMPTS[animation](!!hasBackImage))

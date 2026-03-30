@@ -85,8 +85,9 @@ const GARMENT_VISION_PROMPT = `Describe this garment in ONE sentence. Include:
 - Fit (slim, regular, oversized, relaxed)
 - Main colors
 - Fabric type (cotton, polyester, jersey, etc.)
+- Any logos, text, graphics, or printed designs (describe their position, size, and content)
 
-Example: "Black oversized short-sleeve crew-neck t-shirt, heavyweight cotton, relaxed fit"
+Example: "Black oversized short-sleeve crew-neck t-shirt, heavyweight cotton, relaxed fit, with a large white brand logo centered on the chest"
 
 Output ONLY the one-sentence description. No explanation, no preamble.`
 
@@ -143,6 +144,9 @@ const CATEGORY_LIGHTING: Record<string, string> = {
 
 function buildScenePromptFromContext(garmentType: string, input: PromptGenerationInput, isImage: boolean): string {
   const parts: string[] = []
+
+  // 0. Design preservation mandate — always first
+  parts.push('Use the reference image EXACTLY as provided. Do NOT modify, redesign, or alter the jersey in any way. The jersey design, color, pattern, logos, and text must remain 100% identical to the reference image')
 
   // 1. Quality anchor
   parts.push('Ultra-realistic fashion editorial photograph, indistinguishable from a real photo')
@@ -430,18 +434,35 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
       // Generate for both front and back if back image is provided
       const resultUrls: string[] = [];
 
+      // Build back-view prompt: same scene but model turned away showing the back
+      function buildBackPrompt(basePrompt: string): string {
+        // Replace common front-facing pose phrases with back-facing equivalents
+        let back = basePrompt
+          .replace(/direct gaze at camera/gi, 'facing away from camera')
+          .replace(/standing confident pose[^,.]*/gi, 'standing naturally with back to camera')
+          .replace(/looking (?:slightly )?(?:off-camera|at camera)/gi, 'facing away from camera')
+          .replace(/front view/gi, 'back view')
+        // Append explicit back-view instruction
+        back += '. Model is turned 180 degrees with back fully facing the camera, showing the complete back side of the garment. Back design, logos, and graphics displayed exactly as the uploaded back image'
+        return back
+      }
+
       // Helper function to generate one image
       async function generateOneImage(designUrl: string, label: string): Promise<string> {
         console.log(`[Replicate] ── Generating ${label} image ──`);
 
+        const promptForThisView = label === 'BACK'
+          ? buildBackPrompt(request.prompt)
+          : request.prompt
+
         // Step 2: Generate person in scene
         console.log('[Replicate] ── Step 2: Generate person in scene (FLUX.2 Pro) ──');
-        console.log('[Replicate] Prompt:', request.prompt.substring(0, 100) + '...');
+        console.log('[Replicate] Prompt:', promptForThisView.substring(0, 100) + '...');
 
         const raw = await runWithRetry(
           "black-forest-labs/flux-2-pro",
           {
-            prompt: request.prompt,
+            prompt: promptForThisView,
             aspect_ratio: 'custom',
             width: 1024,
             height: 1344,
@@ -462,12 +483,14 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         const isDataUri = designUrl.startsWith('data:')
         console.log('[Replicate] Garment image:', isDataUri ? `data URI (${Math.round(designUrl.length / 1024)}KB)` : designUrl)
 
+        const vtonGarmentDesc = `${label === 'BACK' ? 'Back side of: ' : ''}${request.garmentDescription || 'Clothing garment'}. Preserve all logos, text, graphics, and printed designs exactly as they appear on the ${label === 'BACK' ? 'back of the' : 'original'} garment — no distortion, no removal, no modification.`
+
         const vtonOutput = await runWithRetry(
           "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
           {
             garm_img: designUrl,
             human_img: personImageUrl,
-            garment_des: request.garmentDescription || 'Clothing garment',
+            garment_des: vtonGarmentDesc,
             category: 'upper_body',
             crop: true,
             steps: 40,
@@ -534,17 +557,20 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
               end_image: request.backDesignUrl,
               mode: 'pro',
               duration: 10,
-              negative_prompt: "blur, distort, low quality, deformed, changing colors, modified design, altered graphics, wrong pattern, extra logos, missing logos, morphing fabric, added text, removed text",
+              negative_prompt: "blur, distort, low quality, deformed, changing colors, modified design, altered graphics, wrong pattern, extra logos, missing logos, morphing fabric, added text, removed text, logo distortion, smeared text, warped graphics, melting logo, blurry print, stretched logo, deformed text, incorrect lettering",
             }
           ) as unknown as string
         } else {
           // ── Front only: Use MiniMax (good single-frame quality) ──
           console.log('[Replicate] Using MiniMax video-01 for single-frame product video')
 
+          // Append logo preservation to the prompt for MiniMax
+          const miniMaxPrompt = request.prompt + '. CRITICAL: All logos, text, and graphics on the garment must remain perfectly sharp, undistorted, and identical to the starting frame throughout the entire video.'
+
           videoOutput = await runWithRetry(
             "minimax/video-01",
             {
-              prompt: request.prompt,
+              prompt: miniMaxPrompt.length > 512 ? miniMaxPrompt.substring(0, 512) : miniMaxPrompt,
               first_frame_image: request.designUrl,
               prompt_optimizer: false,
             }
@@ -589,12 +615,14 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         console.log('[Replicate] ── Step 3: Virtual Try-On (IDM-VTON) ──');
         console.log('[Replicate] Garment image:', isDataUri ? `data URI (${Math.round(request.designUrl.length / 1024)}KB)` : request.designUrl)
 
+        const videoVtonGarmentDesc = `${request.garmentDescription || 'Clothing garment'}. Preserve all logos, text, graphics, and printed designs exactly as they appear on the original garment — no distortion, no removal, no modification.`
+
         const vtonOutput = await runWithRetry(
           "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
           {
             garm_img: request.designUrl,
             human_img: personImageUrl,
-            garment_des: request.garmentDescription || 'Clothing garment',
+            garment_des: videoVtonGarmentDesc,
             category: 'upper_body',
             crop: true,
             steps: 40,
@@ -630,7 +658,7 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
 
         const categoryMotion = (request.brandCategory && categoryMotions[request.brandCategory]) || 'The model moves subtly with gentle body sway, natural breathing, slight confident head turn'
 
-        const motionPrompt = `Cinematic fashion video, real person, photorealistic. ${categoryMotion}. The clothing, prints, graphics, colors, and every garment detail remain PERFECTLY IDENTICAL to the starting image throughout — zero outfit changes. Smooth slow-motion, soft cinematic lighting, luxury brand advertisement quality.`
+        const motionPrompt = `Cinematic fashion video, real person, photorealistic. ${categoryMotion}. CRITICAL: All logos, text, graphics, prints, colors, and every garment detail must remain PERFECTLY IDENTICAL and undistorted throughout every frame — the design on the clothing never changes, warps, fades, smears, or morphs. Smooth slow-motion, soft cinematic lighting, luxury brand advertisement quality.`
 
         const videoOutput = await runWithRetry(
           "kwaivgi/kling-v2.6",
@@ -639,7 +667,7 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
             start_image: tryonUrl,
             duration: 10,
             aspect_ratio: "9:16",
-            negative_prompt: "blur, distort, low quality, deformed, cartoon, anime, painting, 3D render, changing clothes, different clothing, modified clothing, wardrobe change, sleeve length change, new pattern, altered graphics, color change, morphing fabric, disappearing design, fading print, extra logos, missing logos, wrong neckline, plastic skin, unrealistic, CGI",
+            negative_prompt: "blur, distort, low quality, deformed, cartoon, anime, painting, 3D render, changing clothes, different clothing, modified clothing, wardrobe change, sleeve length change, new pattern, altered graphics, color change, morphing fabric, disappearing design, fading print, extra logos, missing logos, wrong neckline, plastic skin, unrealistic, CGI, logo distortion, smeared text, warped graphics, melting logo, blurry print, stretched logo, deformed text, incorrect lettering",
             generate_audio: false,
           }
         ) as unknown as string

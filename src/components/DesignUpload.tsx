@@ -100,88 +100,116 @@ export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUpload
     side: 'front' | 'back';
     image: string | null;
     required?: boolean;
-  }) => (
-    <div className="relative">
-      <input
-        ref={side === 'front' ? frontInputRef : backInputRef}
-        type="file"
-        accept="image/*"
-        onChange={(e) => handleFileSelect(e, side)}
-        className="hidden"
-      />
-
-      <motion.div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(side);
-        }}
-        onDragLeave={() => setIsDragging(null)}
-        onDrop={(e) => handleDrop(e, side)}
-        onClick={() =>
-          side === 'front' ? frontInputRef.current?.click() : backInputRef.current?.click()
-        }
-        className={`relative aspect-[3/4] rounded-3xl border-2 border-dashed cursor-pointer overflow-hidden transition-all ${
-          isDragging === side
-            ? 'border-black bg-neutral-50 scale-[1.02]'
-            : image
-            ? 'border-transparent'
-            : 'border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50'
-        }`}
-        whileHover={!image ? { scale: 1.01 } : {}}
-      >
-        {image ? (
-          <div className="relative w-full h-full group">
-            <img src={image} alt={`${side} design`} className="w-full h-full object-contain bg-neutral-100" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-              <motion.button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (side === 'front') setFrontImage(null);
-                  else setBackImage(null);
-                }}
-                className="opacity-0 group-hover:opacity-100 bg-white text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <X className="w-4 h-4" />
-                Remove
-              </motion.button>
-            </div>
-            {/* Design Ready Badge */}
-            <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg">
-              <p className="text-sm font-semibold text-black mb-0.5">Design ready</p>
-              <p className="text-xs text-neutral-600">AI is preparing the photoshoot setup</p>
-            </div>
+  }) => {
+    const isFront = side === 'front';
+    return (
+      <div className="relative flex flex-col gap-3">
+        {/* Side Label */}
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
+              isFront ? 'bg-black text-white' : 'bg-neutral-200 text-neutral-700'
+            }`}>
+              {isFront ? 'Front' : 'Back'}
+            </span>
+            {!isFront && (
+              <span className="text-xs text-neutral-400 font-medium">Optional</span>
+            )}
           </div>
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mb-4">
-              <Upload className="w-8 h-8 text-neutral-400" />
-            </div>
-            <p className="font-semibold text-lg mb-3">
-              Drag & drop your design here
-            </p>
-            <p className="text-sm text-neutral-500 mb-2">
-              or click to upload
-            </p>
-            <p className="text-xs text-neutral-400">PNG or JPG · High quality recommended</p>
-          </div>
-        )}
-      </motion.div>
+          {isFront && (
+            <span className="text-xs text-neutral-400">Required</span>
+          )}
+        </div>
 
-      {image && (
+        <input
+          ref={side === 'front' ? frontInputRef : backInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFileSelect(e, side)}
+          className="hidden"
+        />
+
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="absolute -top-3 -right-3 w-9 h-9 bg-black rounded-full flex items-center justify-center shadow-lg z-10"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(side);
+          }}
+          onDragLeave={() => setIsDragging(null)}
+          onDrop={(e) => handleDrop(e, side)}
+          onClick={() =>
+            side === 'front' ? frontInputRef.current?.click() : backInputRef.current?.click()
+          }
+          className={`relative aspect-[3/4] rounded-3xl border-2 border-dashed cursor-pointer overflow-hidden transition-all ${
+            isDragging === side
+              ? 'border-black bg-neutral-50 scale-[1.02]'
+              : image
+              ? 'border-transparent'
+              : isFront
+              ? 'border-black/30 hover:border-black hover:bg-neutral-50'
+              : 'border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50'
+          }`}
+          whileHover={!image ? { scale: 1.01 } : {}}
         >
-          <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-            <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          {image ? (
+            <div className="relative w-full h-full group">
+              <img src={image} alt={`${side} design`} className="w-full h-full object-contain bg-neutral-100" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (side === 'front') setFrontImage(null);
+                    else setBackImage(null);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 bg-white text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <X className="w-4 h-4" />
+                  Remove
+                </motion.button>
+              </div>
+              {/* Design Ready Badge */}
+              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg">
+                <p className="text-sm font-semibold text-black mb-0.5">
+                  {isFront ? 'Front side ready' : 'Back side ready'}
+                </p>
+                <p className="text-xs text-neutral-600">
+                  {isFront ? 'Sent to AI as front view' : 'Sent to AI as back view'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+                isFront ? 'bg-black/5' : 'bg-neutral-100'
+              }`}>
+                <Upload className={`w-8 h-8 ${isFront ? 'text-black/40' : 'text-neutral-400'}`} />
+              </div>
+              <p className="font-semibold text-lg mb-1">
+                {isFront ? 'Front of shirt' : 'Back of shirt'}
+              </p>
+              <p className="text-sm text-neutral-500 mb-3">
+                {isFront ? 'Drag & drop or click to upload' : 'Drag & drop or click to upload'}
+              </p>
+              <p className="text-xs text-neutral-400">PNG or JPG · High quality recommended</p>
+            </div>
+          )}
         </motion.div>
-      )}
-    </div>
-  );
+
+        {image && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-9 -right-3 w-9 h-9 bg-black rounded-full flex items-center justify-center shadow-lg z-10"
+          >
+            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -275,10 +303,10 @@ export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUpload
             className="text-center mb-3"
           >
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">
-              Upload your design
+              Upload your shirt
             </h2>
             <p className="text-lg text-neutral-500">
-              Front and back supported
+              Left = Front · Right = Back (optional)
             </p>
           </motion.div>
 

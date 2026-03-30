@@ -53,6 +53,9 @@ export class CinematicPromptGenerator {
 
     const parts: string[] = []
 
+    // 0. Design preservation mandate (always first, never truncated)
+    parts.push('Use the reference image EXACTLY as provided. Do NOT modify, redesign, or alter the jersey in any way. The jersey design, color, pattern, logos, and text must remain 100% identical to the reference image')
+
     // 1. Compact brand intro (~60 chars)
     const name = brandName || 'fashion brand'
     const catLabel = category.toLowerCase().replace(/_/g, ' ')
@@ -214,7 +217,10 @@ export class CinematicPromptGenerator {
       parts.push(`featuring ${designDescription}`)
     }
 
-    // 8. Style keyword suffix (~50 chars)
+    // 8. Logo/graphic preservation
+    parts.push('all logos and graphics on garment stay sharp and undistorted')
+
+    // 9. Style keyword suffix (~50 chars)
     const styleKeywords = type === 'video'
       ? 'cinematic 4K, smooth camera motion, film color grade'
       : 'photorealistic, editorial lighting, magazine quality'
@@ -597,7 +603,7 @@ export class CinematicPromptGenerator {
     // Do NOT describe specific garment construction, patterns, or graphics here.
     // The actual garment design is provided via the uploaded image and applied through virtual try-on.
     // This section only reinforces preservation of the original design.
-    let details = 'The model wears the EXACT garment as provided — preserve every detail of the original design including all prints, graphics, logos, colors, patterns, sleeve length, neckline, and fit precisely as uploaded. No modifications, no reinterpretation, no added or removed elements'
+    let details = 'Use the reference image EXACTLY as provided. Do NOT modify, redesign, or alter the jersey in any way. The jersey design, color, pattern, logos, and text must remain 100% identical to the reference image. The model wears the EXACT garment as provided — preserve every detail of the original design including all logos, brand text, printed graphics, colors, patterns, sleeve length, neckline, and fit precisely as uploaded. Logos and text must remain sharp, correctly shaped, and undistorted. No modifications, no reinterpretation, no smearing, no warping, no added or removed elements'
 
     if (designDescription) {
       details += `. Garment reference: ${designDescription}`
@@ -701,7 +707,7 @@ export class CinematicPromptGenerator {
   getNegativePrompts(): string {
     const { category } = this.config
 
-    const baseNegative = 'cartoon, anime, painting, drawing, illustration, 3D render, CGI, blurry, out of focus, low resolution, watermark, text overlay, deformed anatomy, extra limbs, distorted face, unnatural skin, plastic skin, modified garment design, altered graphics, changed pattern, different print from original, added logos, removed logos, wrong sleeve length, wrong neckline'
+    const baseNegative = 'cartoon, anime, painting, drawing, illustration, 3D render, CGI, blurry, out of focus, low resolution, watermark, text overlay, deformed anatomy, extra limbs, distorted face, unnatural skin, plastic skin, modified garment design, altered graphics, changed pattern, different print from original, added logos, removed logos, wrong sleeve length, wrong neckline, logo distortion, smeared text, warped graphics, melting logo, blurry print, stretched logo, deformed text, incorrect lettering, morphed logo'
 
     const categoryNegative: Record<BrandCategory, string> = {
       MEDICAL_WEAR: `${baseNegative}, bloody, gory, scary, horror medical, halloween costume, toy stethoscope, costume-quality fabric, wrinkled fabric, stained clothing`,
@@ -726,10 +732,10 @@ export class CinematicPromptGenerator {
     const { type } = this.config
 
     if (type === 'video') {
-      return 'Quality: Broadcast-grade cinematic video, professional color science, accurate fabric physics and draping in motion, realistic human movement and expression, consistent lighting throughout shot, no flickering or artifacts, smooth frame interpolation. CRITICAL: The garment design, prints, colors, and all details must remain exactly as the original uploaded design throughout every frame — zero modifications'
+      return 'Quality: Broadcast-grade cinematic video, professional color science, accurate fabric physics and draping in motion, realistic human movement and expression, consistent lighting throughout shot, no flickering or artifacts, smooth frame interpolation. CRITICAL: All logos, text, graphics, prints, colors, and garment details must remain perfectly sharp, undistorted, and exactly as the original uploaded design throughout every frame — zero modifications, no smearing, no warping'
     }
 
-    return 'Quality: Magazine-grade photorealistic output, accurate human anatomy and proportions, natural fabric physics and draping, genuine skin texture and tones, no AI artifacts, production-ready resolution. CRITICAL: The garment design, prints, colors, and all details must remain exactly as the original uploaded design — zero modifications'
+    return 'Quality: Magazine-grade photorealistic output, accurate human anatomy and proportions, natural fabric physics and draping, genuine skin texture and tones, no AI artifacts, production-ready resolution. CRITICAL: All logos, text, graphics, prints, colors, and garment details must remain perfectly sharp, undistorted, and exactly as the original uploaded design — zero modifications, no smearing, no warping'
   }
 
   optimizePrompt(prompt: string): string {
