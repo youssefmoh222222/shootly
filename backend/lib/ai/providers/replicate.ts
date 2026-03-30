@@ -164,7 +164,7 @@ function buildScenePromptFromContext(garmentType: string, input: PromptGeneratio
     .replace(/\b(black|white|red|blue|green|yellow|pink|purple|orange|grey|gray|navy|beige|brown)\b/gi, '') // remove colors
     .replace(/,.*$/, '')               // take only first clause
     .trim() || 'garment'
-  parts.push(`wearing a plain white ${cleanGarmentType} that drapes naturally with realistic fabric folds and weight`)
+  parts.push(`wearing a completely plain solid white ${cleanGarmentType} with zero graphics, zero text, zero logos, zero patterns — entirely blank white fabric, natural drape and fabric weight`)
 
   // 4. Pose — from director control or default
   const poseDescriptions: Record<string, string> = {
@@ -434,17 +434,25 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
       // Generate for both front and back if back image is provided
       const resultUrls: string[] = [];
 
-      // Build back-view prompt: same scene but model turned away showing the back
+      // Build back-view prompt: prepend a dominant back-view directive so FLUX.2
+      // generates a rear-facing person, then strip any front-facing language.
       function buildBackPrompt(basePrompt: string): string {
-        // Replace common front-facing pose phrases with back-facing equivalents
+        // Strong rear-view directive — must be first so FLUX.2 weights it highest
+        const rearDirective = 'REAR VIEW. Model standing with their back completely facing the camera. Posterior view. Back of the body visible. Model facing away from camera'
+
+        // Strip all front-facing language from the base prompt
         let back = basePrompt
-          .replace(/direct gaze at camera/gi, 'facing away from camera')
-          .replace(/standing confident pose[^,.]*/gi, 'standing naturally with back to camera')
-          .replace(/looking (?:slightly )?(?:off-camera|at camera)/gi, 'facing away from camera')
-          .replace(/front view/gi, 'back view')
-        // Append explicit back-view instruction
-        back += '. Model is turned 180 degrees with back fully facing the camera, showing the complete back side of the garment. Back design, logos, and graphics displayed exactly as the uploaded back image'
-        return back
+          .replace(/direct gaze at camera[^,.]*/gi, 'facing away from camera')
+          .replace(/gaze at camera[^,.]*/gi, 'looking away')
+          .replace(/standing with relaxed confident stance[^,.]*/gi, 'standing upright with back to camera')
+          .replace(/standing with confident stance[^,.]*/gi, 'standing upright with back to camera')
+          .replace(/standing confident[^,.]*/gi, 'standing with back to camera')
+          .replace(/slight head tilt, natural expression/gi, 'back of head visible')
+          .replace(/intense focused gaze[^,.]*/gi, 'back of head visible')
+          .replace(/looking (?:slightly )?(?:off-camera|at camera)[^,.]*/gi, 'facing away from camera')
+          .replace(/\bfront view\b/gi, 'back view')
+
+        return `${rearDirective}. ${back}. Full rear view, back of garment completely visible to camera`
       }
 
       // Helper function to generate one image
@@ -483,7 +491,9 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         const isDataUri = designUrl.startsWith('data:')
         console.log('[Replicate] Garment image:', isDataUri ? `data URI (${Math.round(designUrl.length / 1024)}KB)` : designUrl)
 
-        const vtonGarmentDesc = `${label === 'BACK' ? 'Back side of: ' : ''}${request.garmentDescription || 'Clothing garment'}. Preserve all logos, text, graphics, and printed designs exactly as they appear on the ${label === 'BACK' ? 'back of the' : 'original'} garment — no distortion, no removal, no modification.`
+        const baseDesc = request.garmentDescription || 'clothing garment'
+        const sideLabel = label === 'BACK' ? 'back side of the' : ''
+        const vtonGarmentDesc = `${sideLabel} ${baseDesc}. Copy every detail of this garment exactly onto the person: all colors, all logos, all printed text, all graphics, all patterns must appear sharp and undistorted. Do not invent, remove, or modify any design element.`.trim()
 
         const vtonOutput = await runWithRetry(
           "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
@@ -492,9 +502,9 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
             human_img: personImageUrl,
             garment_des: vtonGarmentDesc,
             category: 'upper_body',
-            crop: true,
-            steps: 40,
-            seed: 0,
+            crop: false,
+            steps: 50,
+            seed: 42,
           }
         )
 
