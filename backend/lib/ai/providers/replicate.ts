@@ -455,6 +455,85 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         return `${rearDirective}. ${back}. Full rear view, back of garment completely visible to camera`
       }
 
+      // ── fashn.ai Virtual Try-On (primary — best design preservation) ──
+      async function runFashnTryon(personImageUrl: string, garmentUrl: string, label: string): Promise<string> {
+        const fashnKey = process.env.FASHN_API_KEY
+        if (!fashnKey) throw new Error('no FASHN_API_KEY')
+
+        console.log(`[fashn] Submitting ${label} try-on job...`)
+
+        const submitResp = await fetch('https://api.fashn.ai/v1/run', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${fashnKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model_image: personImageUrl,
+            garment_image: garmentUrl,
+            category: 'tops',
+            mode: 'quality',
+            garment_photo_type: 'flat-lay',
+            output_format: 'png',
+            seed: 42,
+          }),
+        })
+
+        if (!submitResp.ok) {
+          const err = await submitResp.text()
+          throw new Error(`fashn submit error ${submitResp.status}: ${err}`)
+        }
+
+        const { id, error: submitError } = await submitResp.json()
+        if (submitError) throw new Error(`fashn error: ${submitError}`)
+        console.log(`[fashn] Job submitted: ${id}`)
+
+        // Poll every 3 seconds, up to 90 seconds
+        for (let attempt = 0; attempt < 30; attempt++) {
+          await new Promise(r => setTimeout(r, 3000))
+
+          const statusResp = await fetch(`https://api.fashn.ai/v1/status/${id}`, {
+            headers: { 'Authorization': `Bearer ${fashnKey}` },
+          })
+          const data = await statusResp.json()
+          console.log(`[fashn] Poll ${attempt + 1}: status=${data.status}`)
+
+          if (data.status === 'completed') {
+            const outputUrl = Array.isArray(data.output) ? data.output[0] : data.output
+            if (!outputUrl) throw new Error('fashn returned empty output')
+            console.log(`[fashn] ${label} try-on complete:`, outputUrl)
+            return outputUrl
+          }
+
+          if (data.status === 'failed') {
+            throw new Error(`fashn job failed: ${data.error || 'unknown'}`)
+          }
+        }
+
+        throw new Error('fashn job timed out after 90s')
+      }
+
+      // ── IDM-VTON Virtual Try-On (fallback) ──
+      async function runIDMVTON(personImageUrl: string, garmentUrl: string, garmentDesc: string, label: string): Promise<string> {
+        console.log(`[IDM-VTON] Running ${label} try-on...`)
+        const vtonOutput = await runWithRetry(
+          "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
+          {
+            garm_img: garmentUrl,
+            human_img: personImageUrl,
+            garment_des: garmentDesc,
+            category: 'upper_body',
+            crop: false,
+            steps: 50,
+            seed: 42,
+          }
+        )
+        const url = Array.isArray(vtonOutput) ? vtonOutput[0] : String(vtonOutput)
+        if (!url || url.length < 10) throw new Error(`IDM-VTON returned invalid output for ${label}`)
+        console.log(`[IDM-VTON] ${label} try-on complete:`, url)
+        return url
+      }
+
       // Helper function to generate one image
       async function generateOneImage(designUrl: string, label: string): Promise<string> {
         console.log(`[Replicate] ── Generating ${label} image ──`);
@@ -463,9 +542,9 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
           ? buildBackPrompt(request.prompt)
           : request.prompt
 
-        // Step 2: Generate person in scene
+        // Step 2: FLUX.2 — generate person in scene wearing blank white shirt
         console.log('[Replicate] ── Step 2: Generate person in scene (FLUX.2 Pro) ──');
-        console.log('[Replicate] Prompt:', promptForThisView.substring(0, 100) + '...');
+        console.log('[Replicate] Prompt:', promptForThisView.substring(0, 120) + '...');
 
         const raw = await runWithRetry(
           "black-forest-labs/flux-2-pro",
@@ -484,35 +563,25 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         if (!personImageUrl || personImageUrl.length < 10) {
           throw new Error(`[Replicate] FLUX.2 returned invalid output for ${label}`)
         }
-        console.log(`[Replicate] Person image (${label}) generated:`, personImageUrl);
+        console.log(`[Replicate] Person image (${label}):`, personImageUrl)
 
-        // Step 3: Virtual try-on
-        console.log(`[Replicate] ── Step 3: Virtual Try-On (${label}) ──`);
+        // Step 3: Virtual try-on — fashn.ai primary, IDM-VTON fallback
+        console.log(`[Replicate] ── Step 3: Virtual Try-On (${label}) ──`)
         const isDataUri = designUrl.startsWith('data:')
-        console.log('[Replicate] Garment image:', isDataUri ? `data URI (${Math.round(designUrl.length / 1024)}KB)` : designUrl)
+        console.log('[Replicate] Garment:', isDataUri ? `data URI (${Math.round(designUrl.length / 1024)}KB)` : designUrl)
 
         const baseDesc = request.garmentDescription || 'clothing garment'
-        const sideLabel = label === 'BACK' ? 'back side of the' : ''
-        const vtonGarmentDesc = `${sideLabel} ${baseDesc}. Copy every detail of this garment exactly onto the person: all colors, all logos, all printed text, all graphics, all patterns must appear sharp and undistorted. Do not invent, remove, or modify any design element.`.trim()
+        const garmentDesc = `${label === 'BACK' ? 'Back side of: ' : ''}${baseDesc}. Copy every detail exactly: all colors, logos, printed text, graphics, patterns — sharp and undistorted.`
 
-        const vtonOutput = await runWithRetry(
-          "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
-          {
-            garm_img: designUrl,
-            human_img: personImageUrl,
-            garment_des: vtonGarmentDesc,
-            category: 'upper_body',
-            crop: false,
-            steps: 50,
-            seed: 42,
-          }
-        )
-
-        const tryonUrl = Array.isArray(vtonOutput) ? vtonOutput[0] : String(vtonOutput)
-        if (!tryonUrl || tryonUrl.length < 10) {
-          throw new Error(`[Replicate] IDM-VTON returned invalid output for ${label}`)
+        let tryonUrl: string
+        try {
+          tryonUrl = await runFashnTryon(personImageUrl, designUrl, label)
+          console.log(`[Replicate] fashn.ai try-on success (${label})`)
+        } catch (fashnErr: any) {
+          console.warn(`[Replicate] fashn.ai failed (${fashnErr.message}), falling back to IDM-VTON`)
+          tryonUrl = await runIDMVTON(personImageUrl, designUrl, garmentDesc, label)
         }
-        console.log(`[Replicate] Virtual try-on (${label}) success:`, tryonUrl);
+
         return tryonUrl
       }
 
