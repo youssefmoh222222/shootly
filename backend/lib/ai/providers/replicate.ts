@@ -455,17 +455,56 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         return `${rearDirective}. ${back}. Full rear view, back of garment completely visible to camera`
       }
 
-      // Helper function to generate one image
+      // ── FLUX Fill + Redux Try-On (primary) ──────────────────────────────
+      // Auto-generates the garment mask internally. Fast, cheap, FLUX-quality.
+      async function runFluxFillTryon(personImageUrl: string, garmentUrl: string, label: string): Promise<string> {
+        console.log(`[FluxFill] Running ${label} try-on...`)
+        const output = await runWithRetry(
+          "cedoysch/flux-fill-redux-try-on:cf5cb07a25e726fe2fac166a8c5ab52ddccd48657741670fb09d9954d4d8446f",
+          {
+            person_photo: personImageUrl,
+            clothing_image: garmentUrl,
+            garment_category: 'upper wear',
+          }
+        )
+        const url = Array.isArray(output) ? output[0] : String(output)
+        if (!url || url.length < 10) throw new Error(`FluxFill returned invalid output for ${label}`)
+        console.log(`[FluxFill] ${label} try-on complete:`, url)
+        return url
+      }
+
+      // ── IDM-VTON (fallback) ──────────────────────────────────────────────
+      async function runIDMVTON(personImageUrl: string, garmentUrl: string, garmentDesc: string, label: string): Promise<string> {
+        console.log(`[IDM-VTON] Running ${label} try-on (fallback)...`)
+        const output = await runWithRetry(
+          "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
+          {
+            garm_img: garmentUrl,
+            human_img: personImageUrl,
+            garment_des: garmentDesc,
+            category: 'upper_body',
+            crop: false,
+            steps: 50,
+            seed: 42,
+          }
+        )
+        const url = Array.isArray(output) ? output[0] : String(output)
+        if (!url || url.length < 10) throw new Error(`IDM-VTON returned invalid output for ${label}`)
+        console.log(`[IDM-VTON] ${label} try-on complete:`, url)
+        return url
+      }
+
+      // Helper: generate one image (front or back)
       async function generateOneImage(designUrl: string, label: string): Promise<string> {
-        console.log(`[Replicate] ── Generating ${label} image ──`);
+        console.log(`[Replicate] ── Generating ${label} image ──`)
 
         const promptForThisView = label === 'BACK'
           ? buildBackPrompt(request.prompt)
           : request.prompt
 
-        // Step 2: FLUX.2 — generate person in scene wearing blank white shirt
-        console.log('[Replicate] ── Step 2: Generate person in scene (FLUX.2 Pro) ──');
-        console.log('[Replicate] Prompt:', promptForThisView.substring(0, 120) + '...');
+        // Step 2: FLUX.2 Pro — person in scene wearing a blank white shirt
+        console.log('[Replicate] ── Step 2: FLUX.2 Pro — person in scene ──')
+        console.log('[Replicate] Prompt:', promptForThisView.substring(0, 120) + '...')
 
         const raw = await runWithRetry(
           "black-forest-labs/flux-2-pro",
@@ -486,32 +525,22 @@ export async function generateWithReplicate(request: GenerationRequest): Promise
         }
         console.log(`[Replicate] Person image (${label}):`, personImageUrl)
 
-        // Step 3: IDM-VTON — overlay the actual garment design onto the person
-        console.log(`[Replicate] ── Step 3: Virtual Try-On IDM-VTON (${label}) ──`)
+        // Step 3: Virtual try-on — FLUX Fill primary, IDM-VTON fallback
+        console.log(`[Replicate] ── Step 3: Virtual Try-On (${label}) ──`)
         const isDataUri = designUrl.startsWith('data:')
         console.log('[Replicate] Garment:', isDataUri ? `data URI (${Math.round(designUrl.length / 1024)}KB)` : designUrl)
 
         const baseDesc = request.garmentDescription || 'clothing garment'
         const garmentDesc = `${label === 'BACK' ? 'Back side of: ' : ''}${baseDesc}. Copy every detail exactly: all colors, logos, printed text, graphics, patterns — sharp and undistorted.`
 
-        const vtonOutput = await runWithRetry(
-          "cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985",
-          {
-            garm_img: designUrl,
-            human_img: personImageUrl,
-            garment_des: garmentDesc,
-            category: 'upper_body',
-            crop: false,
-            steps: 50,
-            seed: 42,
-          }
-        )
-
-        const tryonUrl = Array.isArray(vtonOutput) ? vtonOutput[0] : String(vtonOutput)
-        if (!tryonUrl || tryonUrl.length < 10) {
-          throw new Error(`[Replicate] IDM-VTON returned invalid output for ${label}`)
+        let tryonUrl: string
+        try {
+          tryonUrl = await runFluxFillTryon(personImageUrl, designUrl, label)
+        } catch (fluxErr: any) {
+          console.warn(`[Replicate] FLUX Fill try-on failed (${fluxErr.message}), falling back to IDM-VTON`)
+          tryonUrl = await runIDMVTON(personImageUrl, designUrl, garmentDesc, label)
         }
-        console.log(`[Replicate] Try-on (${label}) complete:`, tryonUrl)
+
         return tryonUrl
       }
 
