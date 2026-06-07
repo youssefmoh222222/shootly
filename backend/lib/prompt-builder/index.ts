@@ -152,15 +152,20 @@ const CATEGORY_PRODUCT_VIBES: Record<string, string> = {
 }
 
 const PRODUCT_ANIMATION_PROMPTS: Record<ProductAnimation, (hasBack: boolean) => string> = {
+  // 360-degree turntable: camera orbits the garment as a rigid 3D object. Framed as
+  // CAMERA motion (not pixel morph) so mid-frames stay clean.
   rotation: (hasBack) => hasBack
-    ? 'Garment slowly rotates from front view to back view in one smooth steady turn. The clothing piece turns naturally on an invisible mannequin, transitioning from the front design to the back design. Single clean 180-degree rotation, no wobble, no bounce. All logos, text, prints, graphics, and colors must remain perfectly sharp and undistorted throughout — zero changes, no smearing, no warping.'
-    : 'Garment slowly rotates from front view turning to reveal the side and back in one smooth steady 180-degree turn. The clothing piece turns naturally on an invisible mannequin. Single clean rotation, no wobble, no bounce. All logos, text, prints, graphics, and colors must remain perfectly sharp and undistorted throughout — zero changes, no smearing, no warping.',
+    ? 'Professional e-commerce product shot. ONE single slow 180-degree rotation only — the garment turns exactly half a turn, starting on the front in the very first frame and ending on the back in the very last frame, and stopping there. NO second rotation, NO full 360 spin, NO repeated turning. Smooth constant slow speed, like a single half-revolution on a turntable. The garment rotates as a solid rigid 3D object on an invisible mannequin — no warp, no morph. All logos, crests, numbers, text, stripes, colors, and patterns stay pixel-perfect and rotate rigidly with the garment.'
+    : 'Professional e-commerce product shot. ONE single slow 180-degree rotation only — the garment turns exactly half a turn from the front view through the side to the back view, and stops there. NO second rotation, NO full 360 spin, NO repeated turning. Smooth constant slow speed, like a single half-revolution on a turntable. The garment rotates as a solid rigid 3D object on an invisible mannequin — no warp, no morph. All logos, crests, numbers, text, stripes, colors, and patterns stay pixel-perfect and rotate rigidly with the garment.',
+  // Macro detail glide: locked focus on print/fabric detail
   closeup: (_hasBack) =>
-    'Slow cinematic macro close-up gliding across the garment surface, revealing fabric weave, stitching quality, print detail, logo sharpness, and material texture. Shallow depth of field, 100mm macro lens feel. Every logo, text, print, graphic, and color stays EXACTLY as the original — zero changes, no distortion.',
+    'Cinematic macro product reveal. A 100mm macro lens slowly glides across the garment surface, revealing fabric weave, stitching, embroidery thread, print sharpness, logo edge crispness, and material texture. Razor-thin depth of field, soft focus falloff. The garment stays still — only the camera moves. Every logo, crest, number, text element, color, and pattern remains pixel-perfect and identical to the source image throughout every frame, with no morphing or distortion.',
+  // Locked-tripod vertical tracking shot
   pan: (_hasBack) =>
-    'Elegant smooth top-to-bottom camera pan revealing the complete garment from neckline down to hem. Full design visible, steady slow vertical tracking shot. All logos, text, prints, graphics, colors, and construction details remain EXACTLY as shown — zero changes, no warping.',
+    'Elegant top-to-bottom vertical tracking shot. A locked tripod camera slowly tilts (or cranes) downward from the neckline to the hem, revealing the full garment in one smooth continuous move at constant speed. The garment hangs still — only the camera moves. All logos, crests, numbers, text, stripes, colors, and construction details remain pixel-perfect and identical to the source image throughout every frame, with no warping, no morphing, no design change.',
+  // Editorial lifestyle: subtle fabric motion only
   lifestyle: (_hasBack) =>
-    'The garment displayed in a curated styled setting with very gentle subtle fabric movement from a light breeze. Warm natural side lighting, shallow depth of field, editorial product photography mood. All logos, text, prints, graphics, and colors stay EXACTLY as the original — zero changes, no distortion.',
+    'Editorial lifestyle product video. The garment is presented in a curated styled scene with very subtle natural motion — only a soft breeze gently moving the fabric drape, no pose change, no camera pan. Warm directional side lighting, soft shadows, shallow depth of field. The garment stays anchored in frame. All logos, crests, numbers, text, colors, and patterns remain pixel-perfect and identical to the source image throughout every frame — fabric ripples gently but never warps the print.',
 }
 
 export function buildProductShowcasePrompt(

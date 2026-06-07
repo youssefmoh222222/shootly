@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 import { resolve } from 'path';
 import fs from 'fs';
@@ -30,15 +31,15 @@ function uiResolvePlugin() {
 }
 
 // Vercel backend URL - update this when deploying to production
-// The backend is deployed at: https://youssefmoh222222-shootly.vercel.app
-const VERCEL_BACKEND_URL = 'https://youssefmoh222222-shootly.vercel.app';
+// The backend is deployed at: https://shootly-z6o8.vercel.app
+const VERCEL_BACKEND_URL = 'https://shootly-z6o8.vercel.app';
 
 export default defineConfig({
-  plugins: [react(), uiResolvePlugin()],
+  plugins: [react(), tailwindcss(), uiResolvePlugin()],
   define: {
     // Inject the backend URL at build time based on environment
     'import.meta.env.VITE_API_URL': JSON.stringify(
-      process.env.VITE_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://youssefmoh222222-shootly.vercel.app')
+      process.env.VITE_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://shootly-z6o8.vercel.app')
     )
   },
   resolve: {

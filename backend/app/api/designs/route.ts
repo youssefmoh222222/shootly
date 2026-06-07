@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '../../../lib/prisma'
 import { verifyToken } from '../../../lib/auth'
 import { successResponse, errorResponse } from '../../../lib/utils'
+import { uploadToPermanentStorage } from '../../../lib/cloudinary'
 
 // Mark as dynamic to prevent static rendering error
 export const dynamic = 'force-dynamic';
@@ -112,13 +113,20 @@ export async function POST(request: NextRequest) {
       return errorResponse('Brand profile not found or unauthorized', 404)
     }
 
+    // Upload design images to Cloudinary if they are base64 data URIs
+    // This prevents large payloads from hitting Postgres size limits
+    const [storedImageUrl, storedBackImageUrl] = await Promise.all([
+      imageUrl.startsWith('data:') ? uploadToPermanentStorage(imageUrl, 'shootly/designs') : Promise.resolve(imageUrl),
+      backImageUrl?.startsWith('data:') ? uploadToPermanentStorage(backImageUrl, 'shootly/designs') : Promise.resolve(backImageUrl || null),
+    ])
+
     // Create design
     const design = await prisma.design.create({
       data: {
         brandProfileId,
         title: title || null,
-        imageUrl,
-        backImageUrl: backImageUrl || null,
+        imageUrl: storedImageUrl,
+        backImageUrl: storedBackImageUrl,
         customPrompt: customPrompt || null
       },
       include: {

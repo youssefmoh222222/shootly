@@ -477,8 +477,13 @@ function App() {
 
     setCurrentDesign(design);
 
-    // Cache the design for regeneration
-    localStorage.setItem('ai_clothing_studio_last_design', JSON.stringify(design));
+    // Cache the design metadata for regeneration (strip image data URIs — too large for localStorage)
+    try {
+      const { designUrl, backDesignUrl, ...designMeta } = design as any;
+      localStorage.setItem('ai_clothing_studio_last_design', JSON.stringify(designMeta));
+    } catch {
+      // Quota exceeded or storage unavailable — non-critical, skip cache
+    }
 
     setCurrentView('generating');
 
@@ -773,6 +778,7 @@ function App() {
               onDeleteBrand={handleDeleteBrand}
               onLogout={handleLogout}
               onBack={() => setCurrentView('landing')}
+              onViewPricing={() => setCurrentView('pricing')}
             />
           </motion.div>
         )}
@@ -842,6 +848,7 @@ function App() {
               brand={selectedBrand}
               onRegenerate={handleStartGeneration}
               onBack={() => setCurrentView('dashboard')}
+              onViewPricing={() => setCurrentView('pricing')}
             />
           </motion.div>
         )}

@@ -1,0 +1,7 @@
+{
+  "buildCommand": "npx prisma generate && node node_modules/next/dist/bin/next build",
+  "outputDirectory": ".next",
+  "devCommand": "npx next dev -p 3001",
+  "installCommand": "npm install"
+}
+

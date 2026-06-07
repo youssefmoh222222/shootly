@@ -1,7 +1,25 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Camera, Video, Clock, Users, Palette, ChevronDown, User, Sun, Aperture, Paintbrush, PersonStanding, Cloud, Layers, Scan, Clapperboard } from 'lucide-react';
+import {
+  Camera,
+  Video,
+  Clock,
+  Users,
+  Palette,
+  Sun,
+  Aperture,
+  Paintbrush,
+  PersonStanding,
+  Cloud,
+  Layers,
+  Scan,
+  Clapperboard,
+  Check,
+  Wand,
+  SlidersHorizontal,
+  User,
+} from 'lucide-react';
 import type { Brand } from '../App';
+import { FieldLabel, Opt } from './shootly-ui.tsx';
 
 interface Scenario {
   key: string;
@@ -40,105 +58,112 @@ export interface ScenarioSelection {
   cinematicIntelligence?: string;
 }
 
-const seasonOptions = [
+type Option = { value: string; label: string; description: string };
+
+const seasonOptions: Option[] = [
   { value: 'spring', label: 'Spring', description: 'Fresh, renewal themes' },
   { value: 'summer', label: 'Summer', description: 'Bright, vacation vibes' },
   { value: 'fall', label: 'Fall', description: 'Warm, cozy atmospheres' },
-  { value: 'winter', label: 'Winter', description: 'Crisp, luxury textures' }
+  { value: 'winter', label: 'Winter', description: 'Crisp, luxury textures' },
 ];
 
-const timeOptions = [
+const timeOptions: Option[] = [
   { value: 'morning', label: 'Morning', description: 'Soft dawn lighting' },
   { value: 'midday', label: 'Midday', description: 'Bright clear lighting' },
   { value: 'evening', label: 'Evening', description: 'Warm golden lighting' },
-  { value: 'night', label: 'Night', description: 'Dramatic evening mood' }
+  { value: 'night', label: 'Night', description: 'Dramatic evening mood' },
 ];
 
-const demographicOptions = [
+const demographicOptions: Option[] = [
   { value: 'youngAdult', label: 'Young Adult', description: 'Trendy, social media ready' },
   { value: 'professional', label: 'Professional', description: 'Corporate, refined' },
   { value: 'luxury', label: 'Luxury', description: 'Upscale, sophisticated' },
-  { value: 'athletic', label: 'Athletic', description: 'Performance, active' }
+  { value: 'athletic', label: 'Athletic', description: 'Performance, active' },
 ];
 
-const lightingOptions = [
+const lightingOptions: Option[] = [
   { value: 'natural', label: 'Natural', description: 'Soft window light' },
   { value: 'studio', label: 'Studio', description: 'Even softbox lighting' },
   { value: 'dramatic', label: 'Dramatic', description: 'Rim light, deep shadows' },
   { value: 'neon', label: 'Neon', description: 'Vibrant colored glow' },
   { value: 'golden', label: 'Golden Hour', description: 'Warm backlight, flare' },
-  { value: 'flash', label: 'Flash', description: 'Harsh on-camera flash' }
+  { value: 'flash', label: 'Flash', description: 'Harsh on-camera flash' },
 ];
 
-const cameraOptions = [
+const cameraOptions: Option[] = [
   { value: 'wide', label: 'Wide 35mm', description: 'Full scene context' },
   { value: 'standard', label: 'Standard 50mm', description: 'Natural perspective' },
   { value: 'portrait', label: 'Portrait 85mm', description: 'Shallow DOF, bokeh' },
   { value: 'macro', label: 'Macro', description: 'Extreme fabric detail' },
-  { value: 'cinematic', label: 'Anamorphic', description: 'Cinematic widescreen' }
+  { value: 'cinematic', label: 'Anamorphic', description: 'Cinematic widescreen' },
 ];
 
-const colorGradeOptions = [
+const colorGradeOptions: Option[] = [
   { value: 'clean', label: 'Clean', description: 'True-to-life neutral' },
   { value: 'warm', label: 'Warm Film', description: 'Kodak Portra tones' },
   { value: 'cool', label: 'Cool', description: 'Blue shadows, desaturated' },
   { value: 'moody', label: 'Moody', description: 'Crushed blacks, contrast' },
   { value: 'bw', label: 'B&W', description: 'High contrast mono' },
-  { value: 'vintage', label: 'Vintage', description: 'Faded film, grain' }
+  { value: 'vintage', label: 'Vintage', description: 'Faded film, grain' },
 ];
 
-const poseOptions = [
+const poseOptions: Option[] = [
   { value: 'confident', label: 'Confident', description: 'Standing, direct gaze' },
   { value: 'walking', label: 'Walking', description: 'Mid-stride, casual' },
   { value: 'seated', label: 'Seated', description: 'Relaxed, natural' },
   { value: 'dynamic', label: 'Dynamic', description: 'Action, movement' },
   { value: 'candid', label: 'Candid', description: 'Unposed, authentic' },
-  { value: 'editorial', label: 'Editorial', description: 'Angular, striking' }
+  { value: 'editorial', label: 'Editorial', description: 'Angular, striking' },
 ];
 
-const atmosphereOptions = [
+const atmosphereOptions: Option[] = [
   { value: 'clear', label: 'Clear', description: 'Crisp and sharp' },
   { value: 'haze', label: 'Haze', description: 'Soft dreamy fog' },
   { value: 'rain', label: 'Rain', description: 'Wet streets, reflections' },
   { value: 'smoke', label: 'Smoke', description: 'Mist, atmospheric depth' },
   { value: 'dust', label: 'Dust', description: 'Particles, light beams' },
-  { value: 'snow', label: 'Snow', description: 'Snowfall, frosted' }
+  { value: 'snow', label: 'Snow', description: 'Snowfall, frosted' },
 ];
 
-const backgroundOptions = [
+const backgroundOptions: Option[] = [
   { value: 'studio', label: 'Studio', description: 'Seamless backdrop' },
   { value: 'urban', label: 'Urban', description: 'City, concrete' },
   { value: 'nature', label: 'Nature', description: 'Trees, sky, landscape' },
   { value: 'interior', label: 'Interior', description: 'Designed space' },
   { value: 'abstract', label: 'Abstract', description: 'Color wash, artistic' },
-  { value: 'minimal', label: 'Minimal', description: 'Negative space, simple' }
+  { value: 'minimal', label: 'Minimal', description: 'Negative space, simple' },
 ];
 
-const framingOptions = [
+const framingOptions: Option[] = [
   { value: 'fullBody', label: 'Full Body', description: 'Head to toe' },
   { value: 'threeQuarter', label: '3/4 Length', description: 'Head to knees' },
   { value: 'waistUp', label: 'Waist Up', description: 'Upper body focus' },
   { value: 'headshot', label: 'Headshot', description: 'Face and shoulders' },
-  { value: 'detail', label: 'Detail', description: 'Garment close-up' }
+  { value: 'detail', label: 'Detail', description: 'Garment close-up' },
 ];
 
-const cinematicIntelligenceOptions = [
+const cinematicIntelligenceOptions: Option[] = [
   { value: 'filmNoir', label: 'Film Noir', description: 'Shadows, mystery, contrast' },
   { value: 'goldenHollywood', label: 'Golden Hollywood', description: 'Glamour, studio glow' },
   { value: 'neonCyberpunk', label: 'Neon Cyberpunk', description: 'Futuristic, neon-soaked' },
   { value: 'indieFilm', label: 'Indie Film', description: 'Intimate, natural, raw' },
   { value: 'musicVideo', label: 'Music Video', description: 'Stylized, bold, performative' },
-  { value: 'epicCampaign', label: 'Epic Campaign', description: 'Sweeping, aspirational' }
+  { value: 'epicCampaign', label: 'Epic Campaign', description: 'Sweeping, aspirational' },
 ];
 
-const API_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'https://shootly-z6o8.vercel.app/api');
+const API_URL = import.meta.env.DEV
+  ? '/api'
+  : import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : 'https://shootly-z6o8.vercel.app/api';
 
-// Derive a category from vibe when the brand has no explicit category
 const vibeToCategory: Record<string, string> = {
-  'streetwear': 'STREETWEAR',
-  'sports': 'GYMWEAR',
-  'minimal': 'MINIMAL',
+  streetwear: 'STREETWEAR',
+  sports: 'GYMWEAR',
+  minimal: 'MINIMAL',
 };
+
+const PH_FILLS = ['ph-a', 'ph-d', 'ph-e', 'ph-f', 'ph-b', 'ph-c'];
 
 export function ScenarioSelector({ brand, onScenarioSelect, contentType }: ScenarioSelectorProps) {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -147,7 +172,7 @@ export function ScenarioSelector({ brand, onScenarioSelect, contentType }: Scena
   const [timeOfDay, setTimeOfDay] = useState<string>('');
   const [demographic, setDemographic] = useState<string>('');
   const [customDetails, setCustomDetails] = useState<string>('');
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [aiDirect, setAiDirect] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [recommendedModels, setRecommendedModels] = useState<ModelProfile[]>([]);
   const [allModels, setAllModels] = useState<ModelProfile[]>([]);
@@ -167,18 +192,15 @@ export function ScenarioSelector({ brand, onScenarioSelect, contentType }: Scena
   useEffect(() => {
     const loadScenarios = async () => {
       try {
-        const response = await fetch(`${API_URL}/scenarios?category=${encodeURIComponent(effectiveCategory)}&models=true`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('ai_clothing_studio_token')}`
-          }
-        });
-
+        const response = await fetch(
+          `${API_URL}/scenarios?category=${encodeURIComponent(effectiveCategory)}&models=true`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('ai_clothing_studio_token')}` } }
+        );
         if (response.ok) {
           const data = await response.json();
           setScenarios(data.data.scenarios || []);
           setRecommendedModels(data.data.recommendedModels || []);
           setAllModels(data.data.allModels || []);
-          // Auto-select the first recommended model
           if (data.data.recommendedModels?.length > 0) {
             setSelectedModel(data.data.recommendedModels[0].key);
           }
@@ -189,40 +211,95 @@ export function ScenarioSelector({ brand, onScenarioSelect, contentType }: Scena
         setLoading(false);
       }
     };
-
     loadScenarios();
   }, [effectiveCategory]);
 
+  // Emit selection upward. Director controls are only included when the user
+  // has turned off "AI directs everything".
   useEffect(() => {
-    if (selectedScenario) {
-      onScenarioSelect({
-        scenarioKey: selectedScenario,
-        seasonalAdaptation: seasonalAdaptation as any,
-        timeOfDay: timeOfDay as any,
-        demographic: demographic as any,
-        customDetails: customDetails || undefined,
-        modelKey: selectedModel || undefined,
-        lighting: lighting || undefined,
-        camera: camera || undefined,
-        colorGrade: colorGrade || undefined,
-        pose: pose || undefined,
-        atmosphere: atmosphere || undefined,
-        background: background || undefined,
-        framing: framing || undefined,
-        cinematicIntelligence: cinematicIntelligence || undefined,
-      });
-    }
-  }, [selectedScenario, seasonalAdaptation, timeOfDay, demographic, customDetails, selectedModel, lighting, camera, colorGrade, pose, atmosphere, background, framing, cinematicIntelligence, onScenarioSelect]);
+    if (!selectedScenario) return;
+    const manual = !aiDirect;
+    onScenarioSelect({
+      scenarioKey: selectedScenario,
+      modelKey: selectedModel || undefined,
+      customDetails: customDetails || undefined,
+      seasonalAdaptation: manual ? (seasonalAdaptation as any) || undefined : undefined,
+      timeOfDay: manual ? (timeOfDay as any) || undefined : undefined,
+      demographic: manual ? (demographic as any) || undefined : undefined,
+      lighting: manual ? lighting || undefined : undefined,
+      camera: manual ? camera || undefined : undefined,
+      colorGrade: manual ? colorGrade || undefined : undefined,
+      pose: manual ? pose || undefined : undefined,
+      atmosphere: manual ? atmosphere || undefined : undefined,
+      background: manual ? background || undefined : undefined,
+      framing: manual ? framing || undefined : undefined,
+      cinematicIntelligence: manual ? cinematicIntelligence || undefined : undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedScenario,
+    aiDirect,
+    seasonalAdaptation,
+    timeOfDay,
+    demographic,
+    customDetails,
+    selectedModel,
+    lighting,
+    camera,
+    colorGrade,
+    pose,
+    atmosphere,
+    background,
+    framing,
+    cinematicIntelligence,
+  ]);
 
   const displayModels = showAllModels ? allModels : recommendedModels;
+
+  // Generic chip group
+  const ChipGroup = ({
+    icon,
+    label,
+    options,
+    value,
+    onChange,
+  }: {
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    label: string;
+    options: Option[];
+    value: string;
+    onChange: (v: string) => void;
+  }) => (
+    <div>
+      <FieldLabel icon={icon}>{label}</FieldLabel>
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => {
+          const active = value === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => onChange(active ? '' : o.value)}
+              title={o.description}
+              className={`px-3.5 py-2 rounded-full text-[13px] font-semibold border transition-all active:scale-95 ${
+                active ? 'bg-ink text-white border-ink' : 'bg-white text-ink-soft border-line hover:border-ink/25'
+              }`}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
       <div className="animate-pulse">
-        <div className="h-8 bg-neutral-200 rounded-lg mb-4"></div>
-        <div className="grid grid-cols-2 gap-3">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-20 bg-neutral-200 rounded-xl"></div>
+        <div className="h-8 bg-ink/[0.06] rounded-2xl mb-4" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="aspect-[4/5] bg-ink/[0.06] rounded-2xl" />
           ))}
         </div>
       </div>
@@ -230,440 +307,159 @@ export function ScenarioSelector({ brand, onScenarioSelect, contentType }: Scena
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      {/* Scenario Selection */}
-      <div>
+    <div className="space-y-10">
+      {/* Cinematic scenarios */}
+      <section>
         <div className="flex items-center gap-2 mb-4">
           {contentType === 'video' ? (
-            <Video className="w-5 h-5 text-neutral-600" />
+            <Video size={18} className="text-ink" />
           ) : (
-            <Camera className="w-5 h-5 text-neutral-600" />
+            <Camera size={18} className="text-ink" />
           )}
-          <h3 className="text-lg font-semibold">
-            Choose Cinematic Style
-          </h3>
+          <h3 className="text-lg font-bold tracking-tight">Cinematic scenarios</h3>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {scenarios.map((scenario) => (
-            <motion.button
-              key={scenario.key}
-              onClick={() => setSelectedScenario(scenario.key)}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${
-                selectedScenario === scenario.key
-                  ? 'border-black bg-neutral-50'
-                  : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="font-semibold mb-1">{scenario.name}</div>
-              <div className="text-sm text-neutral-600 mb-2">{scenario.description}</div>
-              <div className="text-xs text-neutral-500">Best for: {scenario.bestFor}</div>
-            </motion.button>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+          {scenarios.map((scenario, i) => {
+            const active = selectedScenario === scenario.key;
+            return (
+              <button
+                key={scenario.key}
+                type="button"
+                onClick={() => setSelectedScenario(scenario.key)}
+                className={`relative overflow-hidden rounded-2xl border-2 text-left transition-all duration-200 ${
+                  active ? 'border-ink -translate-y-1 shadow-deep' : 'border-transparent hover:-translate-y-0.5 shadow-float'
+                }`}
+              >
+                <div className={`frame figure aspect-[4/5] ${PH_FILLS[i % PH_FILLS.length]}`}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  {active && (
+                    <span className="absolute top-2.5 right-2.5 grid place-items-center w-7 h-7 rounded-full bg-white shadow-float">
+                      <Check size={15} className="text-ink" strokeWidth={3} />
+                    </span>
+                  )}
+                  <div className="absolute bottom-0 inset-x-0 p-3">
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/65 mb-0.5 truncate">
+                      {scenario.bestFor}
+                    </div>
+                    <div className="text-sm font-bold text-white leading-tight">{scenario.name}</div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* Model Selection */}
+      {/* Model selection */}
       {selectedScenario && displayModels.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-        >
-          <div className="flex items-center justify-between mb-3">
+        <section>
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <User className="w-5 h-5 text-neutral-600" />
-              <h3 className="text-lg font-semibold">Choose Model</h3>
+              <User size={18} className="text-ink" />
+              <h3 className="text-lg font-bold tracking-tight">Choose model</h3>
             </div>
             {allModels.length > recommendedModels.length && (
               <button
                 onClick={() => setShowAllModels(!showAllModels)}
-                className="text-sm text-neutral-500 hover:text-black transition-colors"
+                className="text-sm font-semibold text-ink-soft hover:text-ink transition-colors"
               >
-                {showAllModels ? 'Show Recommended' : `Show All (${allModels.length})`}
+                {showAllModels ? 'Show recommended' : `Show all (${allModels.length})`}
               </button>
             )}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {/* Auto option */}
-            <motion.button
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <Opt
+              compact
+              active={!selectedModel}
               onClick={() => setSelectedModel('')}
-              className={`p-3 rounded-xl border-2 text-left transition-all ${
-                !selectedModel
-                  ? 'border-black bg-neutral-50'
-                  : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="font-semibold text-sm">Auto Select</div>
-              <div className="text-xs text-neutral-500">Best match for your brand</div>
-            </motion.button>
-
+              title="Auto select"
+              desc="Best match for your brand"
+            />
             {displayModels.map((model) => (
-              <motion.button
+              <Opt
                 key={model.key}
+                compact
+                active={selectedModel === model.key}
                 onClick={() => setSelectedModel(model.key)}
-                className={`p-3 rounded-xl border-2 text-left transition-all ${
-                  selectedModel === model.key
-                    ? 'border-black bg-neutral-50'
-                    : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="font-semibold text-sm">{model.shorthand}</div>
-                <div className="text-xs text-neutral-500 mt-1">{model.bestFor}</div>
-              </motion.button>
+                title={model.shorthand}
+                desc={model.bestFor}
+              />
             ))}
           </div>
-        </motion.div>
+        </section>
       )}
 
-      {/* Advanced Options */}
+      {/* Director controls */}
       {selectedScenario && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="overflow-hidden"
-        >
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2 text-neutral-600 hover:text-black transition-colors mb-4"
-          >
-            <span className="font-medium">Director Controls</span>
-            <motion.div
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
+        <section>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal size={18} className="text-ink" />
+              <h3 className="text-lg font-bold tracking-tight">Director controls</h3>
+            </div>
+            <button
+              onClick={() => setAiDirect((a) => !a)}
+              className={`flex items-center gap-2 pl-2 pr-3.5 py-2 rounded-full border text-sm font-semibold transition-all ${
+                aiDirect ? 'grad text-white border-transparent shadow-float' : 'bg-white text-ink-soft border-line hover:border-ink/25'
+              }`}
             >
-              <ChevronDown className="w-4 h-4" />
-            </motion.div>
-          </button>
+              <span className={`grid place-items-center w-6 h-6 rounded-full ${aiDirect ? 'bg-white/20' : 'bg-ink/[0.06]'}`}>
+                <Wand size={13} className={aiDirect ? 'text-white' : 'text-ink-soft'} />
+              </span>
+              AI directs everything
+            </button>
+          </div>
 
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-4 pl-4 border-l-2 border-neutral-100"
-              >
-                {/* Season */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Palette className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Season & Mood</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {seasonOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setSeasonalAdaptation(
-                          seasonalAdaptation === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          seasonalAdaptation === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+          <div
+            className={`relative grid sm:grid-cols-2 gap-x-6 gap-y-6 transition-opacity ${
+              aiDirect ? 'opacity-40 pointer-events-none select-none' : ''
+            }`}
+          >
+            <ChipGroup icon={Sun} label="Lighting" options={lightingOptions} value={lighting} onChange={setLighting} />
+            <ChipGroup icon={Aperture} label="Lens & framing" options={cameraOptions} value={camera} onChange={setCamera} />
+            <ChipGroup icon={Paintbrush} label="Color grade" options={colorGradeOptions} value={colorGrade} onChange={setColorGrade} />
+            <ChipGroup icon={PersonStanding} label="Pose & energy" options={poseOptions} value={pose} onChange={setPose} />
+            <ChipGroup icon={Cloud} label="Atmosphere" options={atmosphereOptions} value={atmosphere} onChange={setAtmosphere} />
+            <ChipGroup icon={Clock} label="Time of day" options={timeOptions} value={timeOfDay} onChange={setTimeOfDay} />
+            <ChipGroup icon={Scan} label="Framing" options={framingOptions} value={framing} onChange={setFraming} />
+            <ChipGroup icon={Layers} label="Background" options={backgroundOptions} value={background} onChange={setBackground} />
+            <ChipGroup icon={Palette} label="Season & mood" options={seasonOptions} value={seasonalAdaptation} onChange={setSeasonalAdaptation} />
+            <ChipGroup icon={Users} label="Target audience" options={demographicOptions} value={demographic} onChange={setDemographic} />
+            <div className="sm:col-span-2">
+              <ChipGroup
+                icon={Clapperboard}
+                label="Cinematic intelligence"
+                options={cinematicIntelligenceOptions}
+                value={cinematicIntelligence}
+                onChange={setCinematicIntelligence}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <FieldLabel hint="optional">Additional details</FieldLabel>
+              <textarea
+                value={customDetails}
+                onChange={(e) => setCustomDetails(e.target.value.slice(0, 150))}
+                placeholder="e.g. focus on fabric texture, urban background, dramatic shadows…"
+                maxLength={150}
+                rows={2}
+                className="w-full px-4 py-3.5 bg-white border border-line rounded-2xl text-[15px] text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-ink/80 focus:border-transparent transition-all resize-none"
+              />
+              <div className="flex justify-end mt-1">
+                <span className="text-xs text-ink-faint font-mono">{customDetails.length} / 150</span>
+              </div>
+            </div>
 
-                {/* Time of Day */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Time of Day</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {timeOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setTimeOfDay(
-                          timeOfDay === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          timeOfDay === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
+            {aiDirect && (
+              <div className="absolute inset-0 grid place-items-center">
+                <div className="flex items-center gap-2 bg-white/90 backdrop-blur px-4 py-2.5 rounded-full border border-line shadow-float pointer-events-none">
+                  <Wand size={16} className="text-ink" />
+                  <span className="text-sm font-semibold text-ink">AI is directing — toggle off to customize</span>
                 </div>
-
-                {/* Target Demographic */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Users className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Target Audience</label>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {demographicOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setDemographic(
-                          demographic === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          demographic === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Cinematic Intelligence */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clapperboard className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Cinematic Intelligence</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {cinematicIntelligenceOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setCinematicIntelligence(
-                          cinematicIntelligence === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          cinematicIntelligence === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Lighting */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sun className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Lighting</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {lightingOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setLighting(
-                          lighting === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          lighting === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Camera / Lens */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Aperture className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Camera / Lens</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {cameraOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setCamera(
-                          camera === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          camera === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Framing */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Scan className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Framing</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {framingOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setFraming(
-                          framing === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          framing === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Color Grade */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Paintbrush className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Color Grade</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {colorGradeOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setColorGrade(
-                          colorGrade === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          colorGrade === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Pose & Expression */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <PersonStanding className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Pose & Expression</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {poseOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setPose(
-                          pose === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          pose === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Atmosphere */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Cloud className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Atmosphere</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {atmosphereOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setAtmosphere(
-                          atmosphere === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          atmosphere === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Background Style */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Layers className="w-4 h-4 text-neutral-600" />
-                    <label className="text-sm font-medium">Background Style</label>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {backgroundOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setBackground(
-                          background === option.value ? '' : option.value
-                        )}
-                        className={`p-2 rounded-lg border text-sm transition-all ${
-                          background === option.value
-                            ? 'border-black bg-black text-white'
-                            : 'border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs opacity-70">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Custom Details */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Additional Details (Optional)
-                  </label>
-                  <textarea
-                    value={customDetails}
-                    onChange={(e) => setCustomDetails(e.target.value.slice(0, 150))}
-                    placeholder="e.g., Focus on fabric texture, urban background, dramatic shadows..."
-                    maxLength={150}
-                    rows={2}
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-none"
-                  />
-                  <div className="flex justify-end mt-1">
-                    <span className="text-xs text-neutral-400 font-mono">
-                      {customDetails.length} / 150
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+        </section>
       )}
-    </motion.div>
+    </div>
   );
 }

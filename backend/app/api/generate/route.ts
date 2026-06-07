@@ -5,6 +5,7 @@ import { generateWithReplicate, generatePromptWithAI } from '../../../lib/ai/pro
 import { generateWithRunway } from '../../../lib/ai/providers/runway'
 import { cinematicScenariosService } from '../../../lib/scenarios/cinematicScenarios'
 import { buildCinematicPrompt, BrandCategory, BrandTone, TargetAudience, EnvironmentType, buildProductShowcasePrompt, ProductAnimation } from '../../../lib/prompt-builder'
+import { uploadToPermanentStorage } from '../../../lib/cloudinary'
 
 // Mark as dynamic to prevent static rendering error
 export const dynamic = 'force-dynamic';
@@ -290,33 +291,32 @@ export async function POST(request: NextRequest) {
     } else {
       // VIDEO generation
       if (mode === 'product') {
-        // Product mode: Use Runway for better design preservation
+        // Product mode: Replicate (Kling) handles all 4 animations with proper prompts
         try {
-          console.log(`[Generate] Starting product video (Runway image-to-video)...`);
-          resultUrl = await generateWithRunway({
+          console.log(`[Generate] Starting product video (animation=${productAnimation || 'rotation'}, hasBack=${!!backDesignUrl})...`);
+          resultUrl = await generateWithReplicate({
             prompt,
             type: 'video',
             designUrl: designUrlForRunway,
             backDesignUrl,
             generationMode: mode,
+            productAnimation: productAnimation || 'rotation',
+            garmentDescription,
+            brandCategory: brand.category,
           });
-        } catch (runwayError: any) {
-          console.error('[Generate] Runway product video failed:', runwayError.message);
-          // Fallback to Replicate
-          console.log('[Generate] Falling back to Replicate...');
+        } catch (replicateError: any) {
+          console.error('[Generate] Replicate product video failed, falling back to Runway:', replicateError.message);
           try {
-            resultUrl = await generateWithReplicate({
+            resultUrl = await generateWithRunway({
               prompt,
               type: 'video',
               designUrl: designUrlForRunway,
               backDesignUrl,
               generationMode: mode,
-              garmentDescription,
-              brandCategory: brand.category,
             });
-          } catch (replicateError: any) {
+          } catch (runwayError: any) {
             return NextResponse.json(
-              { error: `Video generation failed: ${replicateError.message}` },
+              { error: `Video generation failed: ${runwayError.message}` },
               { status: 502 }
             );
           }
@@ -347,7 +347,12 @@ export async function POST(request: NextRequest) {
     console.log('[Generate] Generation complete:', type, resultUrl);
 
     // Parse multiple URLs if comma-separated (for front+back images)
-    const resultUrls = resultUrl.includes(',') ? resultUrl.split(',') : [resultUrl];
+    const rawUrls = resultUrl.includes(',') ? resultUrl.split(',') : [resultUrl];
+
+    // Upload all result URLs to Cloudinary for permanent storage (runs in parallel)
+    console.log(`[Generate] Uploading ${rawUrls.length} result(s) to permanent storage...`)
+    const folder = isImage ? 'shootly/images' : 'shootly/videos'
+    const resultUrls = await Promise.all(rawUrls.map(u => uploadToPermanentStorage(u, folder)))
     const primaryUrl = resultUrls[0];
 
     console.log(`[Generate] Result URLs: ${resultUrls.length} image(s)`);

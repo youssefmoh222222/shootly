@@ -57,10 +57,17 @@ export function GenerationProgress({ brand, totalBrands }: GenerationProgressPro
   }, [currentStage]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
-      <div className="max-w-2xl w-full">
+    <div className="relative min-h-screen flex items-center justify-center bg-ink text-white px-6 grain overflow-hidden">
+      <div
+        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[40rem] h-[40rem] rounded-full blur-3xl opacity-50 -z-0"
+        style={{ background: 'var(--grad)' }}
+      />
+      <div className="relative z-10 max-w-2xl w-full">
         {/* Main Animation */}
         <div className="text-center mb-16">
+          <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/45 mb-6">
+            AI creative director at work
+          </div>
           <motion.div
             className="relative inline-block mb-12"
             animate={{
@@ -73,8 +80,12 @@ export function GenerationProgress({ brand, totalBrands }: GenerationProgressPro
               ease: 'easeInOut'
             }}
           >
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center backdrop-blur-sm">
-              <Sparkles className="w-16 h-16" />
+            <div className="relative w-32 h-32 rounded-full grad flex items-center justify-center shadow-deep">
+              <span
+                className="absolute inset-0 rounded-full"
+                style={{ animation: 'pulsering 2.4s ease-out infinite', background: 'var(--grad)' }}
+              />
+              <Sparkles className="w-16 h-16 relative z-10 text-white" />
             </div>
 
             {/* Orbiting Particles */}
@@ -131,7 +142,7 @@ export function GenerationProgress({ brand, totalBrands }: GenerationProgressPro
         <div className="mb-12">
           <div className="h-2 bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-white rounded-full"
+              className="h-full grad rounded-full"
               style={{ width: `${progress}%` }}
               transition={{ type: 'spring', stiffness: 50, damping: 20 }}
             />
@@ -163,7 +174,7 @@ export function GenerationProgress({ brand, totalBrands }: GenerationProgressPro
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                       isComplete
-                        ? 'bg-white text-black'
+                        ? 'grad text-white'
                         : isActive
                         ? 'bg-white/20 animate-pulse'
                         : 'bg-white/5'
@@ -206,7 +217,7 @@ export function GenerationProgress({ brand, totalBrands }: GenerationProgressPro
         {/* Brand Accent */}
         {brand && (
           <motion.div
-            className="mt-12 h-1 rounded-full mx-auto bg-black"
+            className="mt-12 h-1 rounded-full mx-auto grad"
             style={{ width: '120px' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}

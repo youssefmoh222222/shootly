@@ -1,7 +1,19 @@
 import { useState } from 'react';
-import { Download, RotateCcw, ArrowLeft } from 'lucide-react';
-import { motion } from 'motion/react';
+import {
+  Download,
+  RotateCcw,
+  ArrowLeft,
+  Plus,
+  Check,
+  Play,
+  Maximize,
+  Sparkles,
+  Gem,
+  X,
+  Info,
+} from 'lucide-react';
 import type { Brand, DesignData } from '../App';
+import { Button, Logo } from './shootly-ui.tsx';
 
 interface ProfileResult {
   profileId: string;
@@ -25,7 +37,10 @@ interface ResultsScreenProps {
   brand: Brand | null;
   onRegenerate: (design: DesignData) => void;
   onBack: () => void;
+  onViewPricing?: () => void;
 }
+
+type ResultItem = { url: string; type: 'image' | 'video'; label: string; poster?: string };
 
 async function downloadFile(url: string, filename: string) {
   try {
@@ -39,397 +54,291 @@ async function downloadFile(url: string, filename: string) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(blobUrl);
-  } catch (err) {
-    // Fallback: open in new tab
+  } catch {
     window.open(url, '_blank');
   }
 }
 
-export function ResultsScreen({ content, brand, onRegenerate, onBack }: ResultsScreenProps) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+export function ResultsScreen({ content, brand, onRegenerate, onBack, onViewPricing }: ResultsScreenProps) {
+  const [active, setActive] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
 
-  const brandName = brand?.name?.replace(/\s+/g, '-').toLowerCase() || 'shoot';
+  const brandSlug = brand?.name?.replace(/\s+/g, '-').toLowerCase() || 'shoot';
 
-  const handleDownloadImage = (url: string, index: number) => {
-    const label = content.images.length === 2 ? (index === 0 ? 'front' : 'back') : `${index + 1}`;
-    downloadFile(url, `${brandName}-photo-${label}.webp`);
-  };
+  // Build a unified list of result items from whatever the backend returned.
+  const items: ResultItem[] = content.allResults?.length
+    ? content.allResults
+        .filter((r) => r.resultUrl)
+        .map((r) => ({ url: r.resultUrl, type: 'video', label: r.profileName }))
+    : [
+        ...content.images.map((url, i) => ({
+          url,
+          type: 'image' as const,
+          label: content.images.length === 2 ? (i === 0 ? 'Front' : 'Back') : `Variation ${i + 1}`,
+        })),
+        ...(content.video
+          ? [{ url: content.video, type: 'video' as const, label: 'Video', poster: content.images[0] }]
+          : []),
+      ];
 
-  const handleDownloadVideo = () => {
-    if (content.video) {
-      downloadFile(content.video, `${brandName}-video.mp4`);
-    }
-  };
+  const safeActive = Math.min(active, Math.max(0, items.length - 1));
+  const current = items[safeActive];
+  const allVideo = items.length > 0 && items.every((i) => i.type === 'video');
+  const allImage = items.length > 0 && items.every((i) => i.type === 'image');
 
-  const handleDownloadAll = async () => {
-    for (let i = 0; i < content.images.length; i++) {
-      await downloadFile(content.images[i], `${brandName}-photo-${content.images.length === 2 ? (i === 0 ? 'front' : 'back') : `${i + 1}`}.webp`);
-    }
-    if (content.video) {
-      await downloadFile(content.video, `${brandName}-video.mp4`);
-    }
-  };
-
-  const handleDownloadAllImages = () => {
-    content.images.forEach((img, i) => handleDownloadImage(img, i));
-  };
-
-  // Use the stored design or a default empty one for regeneration
   const handleRegenerate = () => {
-    // Use cached design data from localStorage if available
     const cachedDesign = localStorage.getItem('ai_clothing_studio_last_design');
     if (cachedDesign) {
       try {
-        const design = JSON.parse(cachedDesign);
-        onRegenerate(design);
+        onRegenerate(JSON.parse(cachedDesign));
         return;
       } catch (e) {
         console.error('Failed to parse cached design:', e);
       }
     }
-    // Fallback - go back to design upload
     onBack();
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* Header */}
-      <header className="border-b border-neutral-100 bg-white sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-6">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 text-neutral-600 hover:text-black transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back to Dashboard</span>
-            </button>
+  const downloadItem = (it: ResultItem, index: number) =>
+    downloadFile(it.url, `${brandSlug}-${it.type === 'video' ? `video-${index + 1}.mp4` : `photo-${index + 1}.webp`}`);
 
-            <div className="flex items-center gap-3">
-              <motion.button
-                onClick={handleRegenerate}
-                className="flex items-center gap-2 px-5 py-2.5 border border-neutral-200 rounded-full text-sm font-medium hover:border-neutral-300 transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <RotateCcw className="w-4 h-4" />
-                Regenerate
-              </motion.button>
+  const handleDownloadAll = async () => {
+    for (let i = 0; i < items.length; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await downloadItem(items[i], i);
+    }
+  };
 
-              <motion.button
-                onClick={handleDownloadAll}
-                className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-sm font-semibold"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Download className="w-4 h-4" />
-                Download All
-              </motion.button>
-            </div>
+  const Header = (
+    <header className="sticky top-0 z-40 glass border-b border-line">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 h-[68px] flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink transition-colors shrink-0"
+          >
+            <ArrowLeft size={18} /> <span className="hidden sm:inline">Dashboard</span>
+          </button>
+          <span className="w-px h-6 bg-line hidden sm:block" />
+          <div className="hidden sm:block">
+            <Logo size={30} />
           </div>
         </div>
-      </header>
+        <Button variant="dark" className="px-5! py-2.5! text-sm" onClick={onBack}>
+          <Plus size={16} /> New shoot
+        </Button>
+      </div>
+    </header>
+  );
 
-      {/* Main Content */}
-      <main className="flex-1 px-6 md:px-12 py-12">
-        <div className="max-w-7xl mx-auto">
-          {/* Error State */}
-          {content.error && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-600 mb-6">
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 8v4M12 16h.01" strokeLinecap="round" />
-                </svg>
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight mb-4">
-                Generation encountered an issue
-              </h1>
-              <p className="text-neutral-500 mb-4 max-w-lg mx-auto">{content.error}</p>
-              <motion.button
-                onClick={handleRegenerate}
-                className="px-6 py-3 bg-black text-white rounded-full font-semibold"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Try Again
-              </motion.button>
-            </motion.div>
-          )}
-
-          {/* Success Message */}
-          {!content.error && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-black text-white mb-6"
-              >
-                <motion.svg
-                  className="w-8 h-8"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <motion.path
-                    d="M20 6L9 17l-5-5"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  />
-                </motion.svg>
-              </motion.div>
-
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                Your AI photoshoot is ready
-              </h1>
-              <p className="text-lg text-neutral-500">
-                {content.allResults && content.totalProfiles
-                  ? `Generated for ${content.successCount} of ${content.totalProfiles} brand profiles`
-                  : 'Generated using your brand identity'}
-              </p>
-            </motion.div>
-          )}
-
-          {/* Multi-Profile Results */}
-          {content.allResults && content.allResults.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mb-16"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Results by Brand Profile</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {content.allResults.map((result: any, index: number) => (
-                  <motion.div
-                    key={result.profileId}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 + index * 0.15 }}
-                    className="rounded-2xl border border-neutral-200 overflow-hidden bg-white shadow-sm"
-                  >
-                    <div className="p-4 border-b border-neutral-100">
-                      <h3 className="font-semibold text-lg">{result.profileName}</h3>
-                      <p className="text-sm text-neutral-500 capitalize">{result.category.replace(/_/g, ' ').toLowerCase()}</p>
-                    </div>
-                    <div className="aspect-video bg-neutral-100 group relative">
-                      {result.resultUrl ? (
-                        <video
-                          src={result.resultUrl}
-                          controls
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                          No result
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Images Grid (single-profile mode) */}
-          {content.images.length > 0 && !content.allResults && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mb-16"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Photoshoots</h2>
-                <button
-                  onClick={handleDownloadAllImages}
-                  className="text-sm text-neutral-600 hover:text-black transition-colors font-medium"
-                >
-                  Download Images
-                </button>
-              </div>
-
-              <div className={`grid gap-4 ${content.images.length === 2 ? 'grid-cols-2 max-w-3xl mx-auto' : 'grid-cols-2 md:grid-cols-4'}`}>
-                {content.images.map((image, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
-                    className="group relative aspect-[3/4] rounded-2xl overflow-hidden bg-neutral-100 cursor-pointer"
-                    onClick={() => setSelectedImage(image)}
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <img
-                      src={image}
-                      alt={`Generated content ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-
-                    {/* Front/Back label for 2 images */}
-                    {content.images.length === 2 && (
-                      <div className="absolute top-3 left-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {index === 0 ? 'Front' : 'Back'}
-                      </div>
-                    )}
-
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                      <motion.button
-                        className="opacity-0 group-hover:opacity-100 bg-white text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownloadImage(image, index);
-                        }}
-                      >
-                        <Download className="w-4 h-4" />
-                        Download
-                      </motion.button>
-                    </div>
-
-                    {brand?.logo && (
-                      <img
-                        src={brand.logo}
-                        alt=""
-                        className="absolute top-3 right-3 w-6 h-6 rounded-full object-contain bg-white border border-neutral-200 shadow-lg"
-                      />
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Video Section (single-profile mode) */}
-          {content.video && !content.allResults && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="mb-12"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Video</h2>
-                <button
-                  onClick={handleDownloadVideo}
-                  className="text-sm text-neutral-600 hover:text-black transition-colors font-medium"
-                >
-                  Download Video
-                </button>
-              </div>
-
-              <div className="max-w-4xl">
-                <motion.div
-                  className="relative aspect-[9/16] md:aspect-video rounded-3xl overflow-hidden bg-neutral-100 group"
-                  whileHover={{ scale: 1.01 }}
-                >
-                  <video
-                    src={content.video}
-                    poster={content.images[0] || ''}
-                    controls
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="text-center"
-          >
-            <div className="inline-flex flex-col items-center gap-4 p-8 bg-neutral-50 rounded-3xl border border-neutral-100">
-              <p className="text-sm text-neutral-600">Want a different vibe?</p>
-              <div className="flex gap-3">
-                <motion.button
-                  onClick={handleRegenerate}
-                  className="px-6 py-3 border-2 border-black text-black rounded-full font-semibold hover:bg-black hover:text-white transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Adjust and regenerate
-                </motion.button>
-                <motion.button
-                  onClick={onBack}
-                  className="px-6 py-3 bg-black text-white rounded-full font-semibold"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Create another photoshoot
-                </motion.button>
-              </div>
+  // Error state
+  if (content.error) {
+    const isBilling = /insufficient credit|payment required|\b402\b/i.test(content.error);
+    return (
+      <div className="min-h-screen flex flex-col bg-paper text-ink">
+        {Header}
+        <main className="flex-1 grid place-items-center px-5 sm:px-6 py-16">
+          <div className="text-center max-w-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-100 text-red-600 mb-6">
+              <Info size={28} />
             </div>
-          </motion.div>
+            <h1 className="text-3xl font-extrabold tracking-[-0.03em] mb-3">Generation hit a snag</h1>
+            {isBilling ? (
+              <p className="text-ink-soft mb-8">
+                The image service is out of credit, so generation couldn't run. Add credit to your
+                Replicate account, wait a couple of minutes, then try again.
+              </p>
+            ) : (
+              <p className="text-ink-soft mb-8">{content.error}</p>
+            )}
+            <Button variant="primary" onClick={handleRegenerate}>
+              <RotateCcw size={16} /> Try again
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-paper text-ink">
+      {Header}
+
+      <main className="flex-1 px-5 sm:px-6 py-8 sm:py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full grad text-white text-xs font-bold uppercase tracking-wider mb-4 shadow-float">
+                <Check size={13} strokeWidth={3} /> Shoot ready
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] leading-[1.12] mb-3 pb-0.5">
+                Your <span className="serif-em grad-text">photoshoot</span> is ready
+              </h2>
+              <p className="text-lg text-ink-soft">
+                {content.allResults && content.totalProfiles
+                  ? `${content.successCount} of ${content.totalProfiles} brand profiles`
+                  : `${items.length} ${allVideo ? 'videos' : allImage ? 'images' : 'assets'}`}{' '}
+                · {brand?.name || 'Your brand'} · AI directed
+              </p>
+            </div>
+            {items.length > 0 && (
+              <Button variant="primary" className="text-sm" onClick={handleDownloadAll}>
+                <Download size={16} /> Download all
+              </Button>
+            )}
+          </div>
+
+          {items.length > 0 && current && (
+            <div className="grid lg:grid-cols-[1.5fr_1fr] gap-6 lg:gap-8 items-start">
+              {/* hero result */}
+              <div>
+                <div className="relative rounded-4xl shadow-deep overflow-hidden aspect-[4/5] sm:aspect-[3/2] bg-[#101014] group">
+                  {current.type === 'video' ? (
+                    <video
+                      key={current.url}
+                      src={current.url}
+                      poster={current.poster}
+                      controls
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img src={current.url} alt={current.label} className="absolute inset-0 w-full h-full object-cover" />
+                  )}
+                  <button
+                    onClick={() => setLightbox(true)}
+                    className="absolute top-4 right-4 grid place-items-center w-10 h-10 rounded-full glass text-ink hover:bg-white transition-colors z-10"
+                  >
+                    <Maximize size={17} />
+                  </button>
+                  <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
+                    <div className="text-white">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-white/65 mb-0.5">
+                        {brand?.name || 'Shootly'}
+                      </div>
+                      <div className="text-lg font-bold">{current.label}</div>
+                    </div>
+                  </div>
+                </div>
+                {/* thumbnails */}
+                {items.length > 1 && (
+                  <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
+                    {items.map((it, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActive(i)}
+                        className={`relative w-16 h-20 sm:w-20 sm:h-24 rounded-2xl shrink-0 overflow-hidden border-2 transition-all bg-[#101014] ${
+                          safeActive === i
+                            ? 'border-ink -translate-y-0.5 shadow-float'
+                            : 'border-transparent opacity-80 hover:opacity-100'
+                        }`}
+                      >
+                        {it.type === 'video' ? (
+                          <>
+                            <video src={it.url} poster={it.poster} className="w-full h-full object-cover" muted />
+                            <span className="absolute inset-0 grid place-items-center">
+                              <Play size={14} className="text-white" />
+                            </span>
+                          </>
+                        ) : (
+                          <img src={it.url} alt="" className="w-full h-full object-cover" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* action panel */}
+              <aside className="space-y-4">
+                <div className="bg-white rounded-4xl border border-line p-6 shadow-float">
+                  <h3 className="text-lg font-bold tracking-tight mb-4">{current.label}</h3>
+                  <div className="grid grid-cols-2 gap-3 mb-5">
+                    <Button variant="dark" className="py-3! text-sm" onClick={() => downloadItem(current, safeActive)}>
+                      <Download size={16} /> Download
+                    </Button>
+                    <Button variant="ghost" className="py-3! text-sm" onClick={handleRegenerate}>
+                      <RotateCcw size={15} /> Regenerate
+                    </Button>
+                  </div>
+                  <div className="rounded-2xl bg-paper border border-line p-4 space-y-2.5">
+                    {(
+                      [
+                        ['Brand', brand?.name],
+                        ['Output', allVideo ? `Video · ${items.length}×` : allImage ? `Image · ${items.length}×` : `${items.length} assets`],
+                        ['Direction', 'AI directed'],
+                      ] as [string, string | undefined][]
+                    ).map(([k, v]) => (
+                      <div key={k} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="text-ink-faint">{k}</span>
+                        <span className="font-semibold text-ink text-right truncate">{v || '—'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-4xl border border-line p-6 shadow-float">
+                  <h3 className="text-base font-bold tracking-tight mb-1">Want a different look?</h3>
+                  <p className="text-sm text-ink-soft mb-4">
+                    Re-run with a new scene or tweak the direction — your design stays loaded.
+                  </p>
+                  <div className="space-y-2.5">
+                    <Button variant="primary" className="w-full py-3! text-sm" onClick={handleRegenerate}>
+                      <Sparkles size={16} /> Try another scene
+                    </Button>
+                    <button
+                      onClick={onBack}
+                      className="w-full py-3 rounded-full border border-line text-sm font-semibold text-ink-soft hover:border-ink/25 transition-all"
+                    >
+                      Back to dashboard
+                    </button>
+                  </div>
+                </div>
+
+                {onViewPricing && (
+                  <div className="rounded-4xl grad p-[1.5px] shadow-float">
+                    <div className="rounded-[calc(2rem-1.5px)] bg-white p-5 flex items-center gap-4">
+                      <span className="grid place-items-center w-11 h-11 rounded-2xl grad shrink-0">
+                        <Gem size={20} className="text-white" />
+                      </span>
+                      <div className="flex-1">
+                        <div className="font-bold text-sm">Running low on credits?</div>
+                        <div className="text-xs text-ink-faint">Top up anytime — they never expire.</div>
+                      </div>
+                      <button onClick={onViewPricing} className="text-sm font-bold text-ink hover:underline whitespace-nowrap">
+                        Top up
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </aside>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Image Modal */}
-      {selectedImage && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6"
-          onClick={() => setSelectedImage(null)}
+      {/* lightbox */}
+      {lightbox && current && (
+        <div
+          className="fixed inset-0 z-50 bg-ink/90 backdrop-blur grid place-items-center p-6"
+          onClick={() => setLightbox(false)}
         >
-          <motion.img
-            src={selectedImage}
-            alt="Full size preview"
-            className="max-w-full max-h-full object-contain rounded-2xl"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          />
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const idx = content.images.indexOf(selectedImage!);
-              handleDownloadImage(selectedImage!, idx >= 0 ? idx : 0);
-            }}
-            className="absolute top-6 left-6 bg-white text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-neutral-100 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Download
+          <button className="absolute top-5 right-5 grid place-items-center w-11 h-11 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors">
+            <X size={20} />
           </button>
-          <button
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-6 right-6 text-white hover:text-neutral-300 transition-colors"
-          >
-            <svg
-              className="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+          <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            {current.type === 'video' ? (
+              <video
+                src={current.url}
+                poster={current.poster}
+                controls
+                autoPlay
+                className="w-full rounded-3xl shadow-deep"
               />
-            </svg>
-          </button>
-        </motion.div>
+            ) : (
+              <img src={current.url} alt={current.label} className="w-full rounded-3xl shadow-deep object-contain" />
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

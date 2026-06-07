@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
-import { Upload, X, ArrowLeft, Sparkles, Info } from 'lucide-react';
+import { Upload, X, ArrowLeft, Sparkles, Info, ChevronRight, Check, Camera, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { Brand } from '../App';
 import { ScenarioSelector, type ScenarioSelection } from './ScenarioSelector.tsx';
+import { Button, Logo, FieldLabel } from './shootly-ui.tsx';
 
 type ProductAnimation = 'rotation' | 'closeup' | 'pan' | 'lifestyle';
 
@@ -30,16 +31,10 @@ const productAnimations: { id: ProductAnimation; label: string; description: str
   { id: 'lifestyle', label: 'Lifestyle', description: 'Styled setting with subtle motion' },
 ];
 
-const photoshootStyles = [
-  { id: 'urban', label: 'Urban street look', image: 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9' },
-  { id: 'studio', label: 'Studio clean look', image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c' },
-  { id: 'cinematic', label: 'Cinematic video', image: 'https://images.unsplash.com/photo-1558769132-cb1aea9c8b7f' }
-];
-
 const placeholders = [
   'Darker mood with dramatic lighting',
   'More movement, walking pose',
-  'Night city vibe with light smoke'
+  'Night city vibe with light smoke',
 ];
 
 export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUploadProps) {
@@ -49,12 +44,11 @@ export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUpload
   const [showCustomization, setShowCustomization] = useState(false);
   const [customVibe, setCustomVibe] = useState('');
   const [currentPlaceholder] = useState(placeholders[Math.floor(Math.random() * placeholders.length)]);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [contentType, setContentType] = useState<'image' | 'video'>('video');
   const [scenarioData, setScenarioData] = useState<ScenarioSelection | null>(null);
   const [generationMode, setGenerationMode] = useState<'product' | 'cinematic'>('cinematic');
   const [selectedAnimation, setSelectedAnimation] = useState<ProductAnimation>('rotation');
-  const [designDescription, setDesignDescription] = useState('');
+  const [designDescription] = useState('');
 
   const frontInputRef = useRef<HTMLInputElement>(null);
   const backInputRef = useRef<HTMLInputElement>(null);
@@ -62,16 +56,12 @@ export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUpload
   const handleDrop = (e: React.DragEvent, side: 'front' | 'back') => {
     e.preventDefault();
     setIsDragging(null);
-
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = () => {
-        if (side === 'front') {
-          setFrontImage(reader.result as string);
-        } else {
-          setBackImage(reader.result as string);
-        }
+        if (side === 'front') setFrontImage(reader.result as string);
+        else setBackImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -82,464 +72,331 @@ export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUpload
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        if (side === 'front') {
-          setFrontImage(reader.result as string);
-        } else {
-          setBackImage(reader.result as string);
-        }
+        if (side === 'front') setFrontImage(reader.result as string);
+        else setBackImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const ready = !!frontImage && (generationMode === 'product' || !!scenarioData);
+
   const DropZone = ({
     side,
     image,
-    required
+    required,
   }: {
     side: 'front' | 'back';
     image: string | null;
     required?: boolean;
   }) => {
     const isFront = side === 'front';
+    const label = isFront ? 'Front' : 'Back';
     return (
-      <div className="relative flex flex-col gap-3">
-        {/* Side Label */}
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
-              isFront ? 'bg-black text-white' : 'bg-neutral-200 text-neutral-700'
-            }`}>
-              {isFront ? 'Front' : 'Back'}
-            </span>
-            {!isFront && (
-              <span className="text-xs text-neutral-400 font-medium">Optional</span>
-            )}
-          </div>
-          {isFront && (
-            <span className="text-xs text-neutral-400">Required</span>
-          )}
-        </div>
-
+      <div>
+        <FieldLabel hint={isFront ? undefined : 'recommended'}>
+          {label} view {isFront && <span className="text-ink-faint font-normal">· required</span>}
+        </FieldLabel>
         <input
-          ref={side === 'front' ? frontInputRef : backInputRef}
+          ref={isFront ? frontInputRef : backInputRef}
           type="file"
           accept="image/*"
           onChange={(e) => handleFileSelect(e, side)}
           className="hidden"
         />
-
-        <motion.div
+        <div
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(side);
           }}
           onDragLeave={() => setIsDragging(null)}
           onDrop={(e) => handleDrop(e, side)}
-          onClick={() =>
-            side === 'front' ? frontInputRef.current?.click() : backInputRef.current?.click()
-          }
-          className={`relative aspect-[3/4] rounded-3xl border-2 border-dashed cursor-pointer overflow-hidden transition-all ${
+          onClick={() => (isFront ? frontInputRef.current?.click() : backInputRef.current?.click())}
+          className={`group relative w-full aspect-[3/4] rounded-3xl border-2 transition-all duration-200 overflow-hidden cursor-pointer ${
             isDragging === side
-              ? 'border-black bg-neutral-50 scale-[1.02]'
+              ? 'border-ink bg-paper scale-[1.01]'
               : image
-              ? 'border-transparent'
-              : isFront
-              ? 'border-black/30 hover:border-black hover:bg-neutral-50'
-              : 'border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50'
+              ? 'border-ink shadow-float'
+              : 'border-dashed border-line bg-white hover:border-ink/30'
           }`}
-          whileHover={!image ? { scale: 1.01 } : {}}
         >
           {image ? (
-            <div className="relative w-full h-full group">
-              <img src={image} alt={`${side} design`} className="w-full h-full object-contain bg-neutral-100" />
+            <>
+              <img src={image} alt={`${side} design`} className="absolute inset-0 w-full h-full object-contain bg-paper-card" />
+              <span className="absolute top-3 right-3 grid place-items-center w-7 h-7 rounded-full bg-white shadow-float">
+                <Check size={15} className="text-ink" strokeWidth={3} />
+              </span>
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                <motion.button
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (side === 'front') setFrontImage(null);
+                    if (isFront) setFrontImage(null);
                     else setBackImage(null);
                   }}
-                  className="opacity-0 group-hover:opacity-100 bg-white text-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="opacity-0 group-hover:opacity-100 bg-white text-ink px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-opacity"
                 >
-                  <X className="w-4 h-4" />
-                  Remove
-                </motion.button>
+                  <X className="w-4 h-4" /> Remove
+                </button>
               </div>
-              {/* Design Ready Badge */}
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg">
-                <p className="text-sm font-semibold text-black mb-0.5">
-                  {isFront ? 'Front side ready' : 'Back side ready'}
-                </p>
-                <p className="text-xs text-neutral-600">
-                  {isFront ? 'Sent to AI as front view' : 'Sent to AI as back view'}
-                </p>
+              <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60 to-transparent pointer-events-none">
+                <span className="text-xs font-semibold text-white">{label.toLowerCase()}-design.png</span>
               </div>
-            </div>
+            </>
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-                isFront ? 'bg-black/5' : 'bg-neutral-100'
-              }`}>
-                <Upload className={`w-8 h-8 ${isFront ? 'text-black/40' : 'text-neutral-400'}`} />
+            <div className="flex flex-col items-center justify-center gap-3 h-full p-6 text-center">
+              <span className="grid place-items-center w-14 h-14 rounded-full bg-paper border border-line group-hover:scale-105 transition-transform">
+                <Upload size={22} className="text-ink-soft" />
+              </span>
+              <div>
+                <p className="text-sm font-bold text-ink">
+                  {label} {required && <span className="text-ink-faint font-normal">· required</span>}
+                </p>
+                <p className="text-xs text-ink-faint mt-0.5">Drag &amp; drop or click to upload</p>
+                <p className="text-[11px] text-ink-faint mt-1">PNG or JPG · high quality</p>
               </div>
-              <p className="font-semibold text-lg mb-1">
-                {isFront ? 'Front of shirt' : 'Back of shirt'}
-              </p>
-              <p className="text-sm text-neutral-500 mb-3">
-                {isFront ? 'Drag & drop or click to upload' : 'Drag & drop or click to upload'}
-              </p>
-              <p className="text-xs text-neutral-400">PNG or JPG · High quality recommended</p>
             </div>
           )}
-        </motion.div>
-
-        {image && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute top-9 -right-3 w-9 h-9 bg-black rounded-full flex items-center justify-center shadow-lg z-10"
-          >
-            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-              <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </motion.div>
-        )}
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-paper text-ink">
       {/* Header */}
-      <header className="border-b border-neutral-100">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-6">
-          <div className="flex items-center justify-between">
+      <header className="sticky top-0 z-40 glass border-b border-line">
+        <div className="max-w-4xl mx-auto px-5 sm:px-6 h-[68px] flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-neutral-600 hover:text-black transition-colors"
+              className="flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink transition-colors shrink-0"
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back</span>
+              <ArrowLeft size={18} /> <span className="hidden sm:inline">Dashboard</span>
             </button>
+            <span className="w-px h-6 bg-line hidden sm:block" />
+            <div className="hidden sm:block">
+              <Logo size={30} />
+            </div>
           </div>
+          {brand && (
+            <div className="flex items-center gap-2 shrink-0">
+              {brand.logo ? (
+                <img src={brand.logo} alt="" className="w-7 h-7 rounded-full object-cover border border-line" />
+              ) : (
+                <span className="grid place-items-center w-7 h-7 rounded-full grad text-white text-xs font-bold">
+                  {brand.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="text-sm font-semibold hidden sm:inline">{brand.name}</span>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 px-6 md:px-12 py-12">
-        <div className="max-w-6xl mx-auto">
-          {/* Brand Context Card */}
-          {brand && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-12 p-6 bg-neutral-50 rounded-3xl border border-neutral-100"
-            >
-              <div className="flex items-start gap-4">
-                {brand.logo ? (
-                  <img
-                    src={brand.logo}
-                    alt={`${brand.name} logo`}
-                    className="w-12 h-12 rounded-full flex-shrink-0 object-contain bg-white border border-neutral-200"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full flex-shrink-0 bg-neutral-100 border border-neutral-200 flex items-center justify-center">
-                    <span className="text-lg font-bold text-neutral-400">{brand.name.charAt(0).toUpperCase()}</span>
-                  </div>
-                )}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <h3 className="font-semibold text-lg">{brand.name}</h3>
-                    <div className="relative">
-                      <button
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
-                        className="text-neutral-400 hover:text-neutral-600 transition-colors"
-                      >
-                        <Info className="w-4 h-4" />
-                      </button>
-                      <AnimatePresence>
-                        {showTooltip && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            className="absolute left-6 top-0 w-64 bg-black text-white text-xs px-4 py-2 rounded-xl shadow-xl z-10"
-                          >
-                            Your brand style is automatically used in every photoshoot.
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                  <p className="text-sm text-neutral-500 mb-4">Brand identity applied</p>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-neutral-500 mb-1">Style</p>
-                      <p className="text-sm font-medium capitalize">{brand.vibe}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-neutral-500 mb-1">Target audience</p>
-                      <p className="text-sm font-medium">Gen Z / Millennials</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-neutral-500 mb-1">Primary platform</p>
-                      <p className="text-sm font-medium capitalize">{brand.platform}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+      <main className="flex-1 px-5 sm:px-6 py-10 sm:py-14">
+        <div className="max-w-4xl mx-auto">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm font-semibold text-ink-faint mb-4">
+            <span className="text-ink">Upload</span>
+            <ChevronRight size={14} />
+            <span className="text-ink-faint/60">Scene</span>
+            <ChevronRight size={14} />
+            <span className="text-ink-faint/60">Generate</span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] mb-3">Upload your design</h2>
+          <p className="text-lg text-ink-soft mb-10 max-w-2xl">
+            Add clear images of your garment. Front is required; back gives the AI a fuller, more accurate result.
+          </p>
 
-          {/* Title */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-center mb-3"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">
-              Upload your shirt
-            </h2>
-            <p className="text-lg text-neutral-500">
-              Left = Front · Right = Back (optional)
-            </p>
-          </motion.div>
-
-          {/* Upload Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto"
-          >
+          <div className="grid sm:grid-cols-2 gap-5 mb-8">
             <DropZone side="front" image={frontImage} required />
             <DropZone side="back" image={backImage} />
-          </motion.div>
+          </div>
 
-          {/* Content Type & Cinematic Mode Selection */}
+          <div className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-line mb-10">
+            <Info size={18} className="text-ink-faint shrink-0 mt-0.5" />
+            <div className="text-sm text-ink-soft">
+              <span className="font-semibold text-ink">Best results:</span> use flat-lay or ghost-mannequin shots on a
+              plain background, well-lit, with the full garment in frame.
+            </div>
+          </div>
+
+          {/* Content type + mode (revealed once a front image exists) */}
           {frontImage && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-12 max-w-4xl mx-auto"
-            >
-              {/* Content Type Toggle */}
-              <div className="mb-8">
-                <h3 className="text-xl font-bold mb-4 text-center">
-                  Choose Content Type
-                </h3>
-                <div className="flex justify-center gap-2 p-1 bg-neutral-100 rounded-2xl max-w-md mx-auto">
+            <div className="space-y-8">
+              {/* Output type */}
+              <div>
+                <FieldLabel>Output type</FieldLabel>
+                <div className="inline-flex p-1 rounded-full bg-ink/[0.06] border border-line">
                   <button
-                    onClick={() => { setContentType('image'); setGenerationMode('cinematic'); }}
-                    className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
-                      contentType === 'image'
-                        ? 'bg-white text-black shadow-sm'
-                        : 'text-neutral-600 hover:text-black'
+                    onClick={() => {
+                      setContentType('image');
+                      setGenerationMode('cinematic');
+                    }}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                      contentType === 'image' ? 'bg-ink text-white shadow-float' : 'text-ink-soft hover:text-ink'
                     }`}
                   >
-                    📸 Images
+                    <Camera size={15} /> Image
                   </button>
                   <button
                     onClick={() => setContentType('video')}
-                    className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
-                      contentType === 'video'
-                        ? 'bg-white text-black shadow-sm'
-                        : 'text-neutral-600 hover:text-black'
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                      contentType === 'video' ? 'bg-ink text-white shadow-float' : 'text-ink-soft hover:text-ink'
                     }`}
                   >
-                    🎥 Video
+                    <Video size={15} /> Video
                   </button>
                 </div>
               </div>
 
-              {/* Generation Mode Selector */}
-              <div className="mb-8">
-                <h3 className="text-xl font-bold mb-4 text-center">
-                  Generation Mode
-                </h3>
-                <div className="flex justify-center gap-2 p-1 bg-neutral-100 rounded-2xl max-w-lg mx-auto mb-2">
+              {/* Generation mode */}
+              <div>
+                <FieldLabel>Generation mode</FieldLabel>
+                <div className="inline-flex p-1 rounded-full bg-ink/[0.06] border border-line mb-2">
                   {contentType === 'video' && (
                     <button
                       onClick={() => setGenerationMode('product')}
-                      className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all text-sm ${
-                        generationMode === 'product'
-                          ? 'bg-white text-black shadow-sm'
-                          : 'text-neutral-600 hover:text-black'
+                      className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                        generationMode === 'product' ? 'bg-ink text-white shadow-float' : 'text-ink-soft hover:text-ink'
                       }`}
                     >
-                      Product Showcase
+                      Product showcase
                     </button>
                   )}
                   <button
                     onClick={() => setGenerationMode('cinematic')}
-                    className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all text-sm ${
-                      generationMode === 'cinematic'
-                        ? 'bg-white text-black shadow-sm'
-                        : 'text-neutral-600 hover:text-black'
+                    className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                      generationMode === 'cinematic' ? 'bg-ink text-white shadow-float' : 'text-ink-soft hover:text-ink'
                     }`}
                   >
-                    Cinematic Scene
+                    Cinematic scene
                   </button>
                 </div>
-                <p className="text-xs text-neutral-500 text-center max-w-lg mx-auto mb-6">
+                <p className="text-sm text-ink-faint max-w-lg">
                   {generationMode === 'product'
-                    ? 'Animates your uploaded design image — rotation, close-up, pan, or lifestyle shot'
-                    : 'AI-generated cinematic scene with a model — your design is described in the prompt'}
+                    ? 'Animates your uploaded design image — rotation, close-up, pan, or lifestyle shot.'
+                    : 'AI-generated cinematic scene with a model — your design is described in the prompt.'}
                 </p>
               </div>
 
               {/* Mode-specific options */}
               {generationMode === 'product' ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-8"
-                >
-                  <h3 className="text-lg font-semibold mb-4 text-center">
-                    Animation Style
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
-                    {productAnimations.map((anim) => (
-                      <motion.button
-                        key={anim.id}
-                        onClick={() => setSelectedAnimation(anim.id)}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all ${
-                          selectedAnimation === anim.id
-                            ? 'border-black bg-neutral-50'
-                            : 'border-neutral-200 hover:border-neutral-400'
-                        }`}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <p className="font-semibold text-sm mb-1">{anim.label}</p>
-                        <p className="text-xs text-neutral-500">{anim.description}</p>
-                      </motion.button>
-                    ))}
+                <div>
+                  <FieldLabel>Animation style</FieldLabel>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {productAnimations.map((anim) => {
+                      const active = selectedAnimation === anim.id;
+                      return (
+                        <button
+                          key={anim.id}
+                          onClick={() => setSelectedAnimation(anim.id)}
+                          className={`text-left rounded-2xl border p-4 transition-all duration-200 active:scale-[.98] ${
+                            active
+                              ? 'border-transparent bg-ink text-white shadow-float'
+                              : 'border-line bg-white hover:border-ink/20 hover:-translate-y-0.5'
+                          }`}
+                        >
+                          <p className={`font-bold text-sm mb-1 ${active ? 'text-white' : 'text-ink'}`}>{anim.label}</p>
+                          <p className={`text-xs ${active ? 'text-white/65' : 'text-ink-faint'}`}>{anim.description}</p>
+                        </button>
+                      );
+                    })}
                   </div>
-                </motion.div>
-              ) : brand ? (
-                <>
-                  <ScenarioSelector
-                    brand={brand}
-                    contentType={contentType}
-                    onScenarioSelect={setScenarioData}
-                  />
-
-                </>
-              ) : null}
-            </motion.div>
-          )}
-
-          {/* PRO Customization Toggle */}
-          {frontImage && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-12 max-w-2xl mx-auto"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <label className="text-base font-semibold">
-                    Customize the vibe (optional)
-                  </label>
-                  <span className="px-2 py-0.5 bg-black text-white text-xs font-bold rounded-md">
-                    PRO
-                  </span>
                 </div>
-                <button
-                  onClick={() => setShowCustomization(!showCustomization)}
-                  className={`w-12 h-6 rounded-full transition-colors ${
-                    showCustomization ? 'bg-black' : 'bg-neutral-300'
-                  }`}
-                >
-                  <motion.div
-                    className="w-5 h-5 bg-white rounded-full shadow-sm"
-                    animate={{ x: showCustomization ? 26 : 2 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                </button>
-              </div>
-              <p className="text-sm text-neutral-500 mb-4">
-                The AI already understands your brand.
-              </p>
+              ) : brand ? (
+                <ScenarioSelector brand={brand} contentType={contentType} onScenarioSelect={setScenarioData} />
+              ) : null}
 
-              <AnimatePresence>
-                {showCustomization && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
+              {/* PRO customization */}
+              <div className="max-w-2xl">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-semibold text-ink">Customize the vibe</label>
+                    <span className="px-2 py-0.5 grad text-white text-[10px] font-bold rounded-md uppercase tracking-wide">
+                      Pro
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowCustomization(!showCustomization)}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                      showCustomization ? 'grad' : 'bg-ink/15'
+                    }`}
                   >
-                    <div className="pt-4">
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Add small tweaks (optional)
-                      </label>
+                    <span
+                      className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform"
+                      style={{ transform: showCustomization ? 'translateX(26px)' : 'translateX(2px)' }}
+                    />
+                  </button>
+                </div>
+                <p className="text-sm text-ink-faint mb-3">The AI already understands your brand.</p>
+                <AnimatePresence>
+                  {showCustomization && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
                       <textarea
                         value={customVibe}
                         onChange={(e) => setCustomVibe(e.target.value.slice(0, 200))}
                         placeholder={currentPlaceholder}
                         maxLength={200}
                         rows={3}
-                        className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-none"
+                        className="w-full px-4 py-3.5 bg-white border border-line rounded-2xl text-[15px] text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-ink/80 focus:border-transparent transition-all resize-none"
                       />
                       <div className="flex items-center justify-between mt-2">
-                        <p className="text-xs text-neutral-500">
-                          Short guidance only — no need to write a full description.
-                        </p>
-                        <p className="text-xs text-neutral-400 font-mono">
-                          {customVibe.length} / 200
-                        </p>
+                        <p className="text-xs text-ink-faint">Short guidance only — no need to write a full description.</p>
+                        <p className="text-xs text-ink-faint font-mono">{customVibe.length} / 200</p>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           )}
+        </div>
+      </main>
 
-          {/* Generate Buttons */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-center space-y-4"
-          >
-            <motion.button
-              onClick={() => onGenerate({
-                frontImage: frontImage!,
-                backImage: backImage || undefined,
-                customPrompt: customVibe || undefined,
-                generationMode,
-                productAnimation: generationMode === 'product' ? selectedAnimation : undefined,
-                designDescription: generationMode === 'cinematic' ? designDescription || undefined : undefined,
-                scenarioData: generationMode === 'cinematic' ? scenarioData || undefined : undefined,
-                contentType
-              })}
-              disabled={!frontImage || (generationMode === 'cinematic' && !scenarioData)}
-              className="inline-flex flex-col items-center gap-2 bg-black text-white px-12 py-5 rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-black/10"
-              whileHover={frontImage && (generationMode === 'product' || scenarioData) ? { scale: 1.02, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' } : {}}
-              whileTap={frontImage && (generationMode === 'product' || scenarioData) ? { scale: 0.98 } : {}}
+      {/* Sticky footer */}
+      <footer className="border-t border-line bg-paper/90 backdrop-blur sticky bottom-0 z-30">
+        <div className="max-w-4xl mx-auto px-5 sm:px-6 py-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <span className="text-sm text-ink-faint hidden sm:block">
+            {!frontImage
+              ? 'Upload a front view to continue'
+              : ready
+              ? 'Ready to generate'
+              : 'Pick a scene to continue'}
+          </span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:ml-auto">
+            <Button
+              variant="primary"
+              className="text-sm"
+              disabled={!ready}
+              onClick={() =>
+                onGenerate({
+                  frontImage: frontImage!,
+                  backImage: backImage || undefined,
+                  customPrompt: customVibe || undefined,
+                  generationMode,
+                  productAnimation: generationMode === 'product' ? selectedAnimation : undefined,
+                  designDescription: generationMode === 'cinematic' ? designDescription || undefined : undefined,
+                  scenarioData: generationMode === 'cinematic' ? scenarioData || undefined : undefined,
+                  contentType,
+                })
+              }
             >
-              <span className="flex items-center gap-3 text-lg">
-                <Sparkles className="w-5 h-5" />
-                {generationMode === 'product' ? 'Generate Product Video' : 'Generate AI Photoshoot'}
-              </span>
-              <span className="text-sm opacity-80">
-                For selected brand only
-              </span>
-            </motion.button>
-
-            {/* Generate for All Brands */}
+              <Sparkles size={16} />
+              {generationMode === 'product' ? 'Generate product video' : 'Generate photoshoot'}
+            </Button>
             {brands && brands.length > 1 && (
-              <div>
-                <motion.button
-                  onClick={() => onGenerate({
+              <Button
+                variant="dark"
+                className="text-sm"
+                disabled={!ready}
+                onClick={() =>
+                  onGenerate({
                     frontImage: frontImage!,
                     backImage: backImage || undefined,
                     customPrompt: customVibe || undefined,
@@ -549,25 +406,15 @@ export function DesignUpload({ brand, brands, onGenerate, onBack }: DesignUpload
                     scenarioData: generationMode === 'cinematic' ? scenarioData || undefined : undefined,
                     contentType,
                     generateForAll: true,
-                  })}
-                  disabled={!frontImage || (generationMode === 'cinematic' && !scenarioData)}
-                  className="inline-flex flex-col items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-5 rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20"
-                  whileHover={frontImage && (generationMode === 'product' || scenarioData) ? { scale: 1.02, boxShadow: '0 20px 40px rgba(147,51,234,0.2)' } : {}}
-                  whileTap={frontImage && (generationMode === 'product' || scenarioData) ? { scale: 0.98 } : {}}
-                >
-                  <span className="flex items-center gap-3 text-lg">
-                    <Sparkles className="w-5 h-5" />
-                    Generate for All Brands ({brands.length})
-                  </span>
-                  <span className="text-sm opacity-80">
-                    Each brand gets its own unique prompt and style
-                  </span>
-                </motion.button>
-              </div>
+                  })
+                }
+              >
+                <Sparkles size={16} /> All brands ({brands.length})
+              </Button>
             )}
-          </motion.div>
+          </div>
         </div>
-      </main>
+      </footer>
     </div>
   );
 }
