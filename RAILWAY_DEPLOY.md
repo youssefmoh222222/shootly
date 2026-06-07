@@ -3,13 +3,23 @@
 This repo is **two apps** that deploy as **two Railway services** from the same GitHub repo,
 plus the existing **Neon Postgres** (kept as-is — no migration).
 
-| Service  | Root directory | Builds        | Serves                          |
-|----------|----------------|---------------|---------------------------------|
-| Backend  | `backend`      | Next.js API   | `next start` on `$PORT`         |
-| Frontend | `/` (repo root)| Vite → `dist` | `serve -s dist` on `$PORT`      |
+| Service  | Root directory | Builds (Dockerfile)      | Serves                     |
+|----------|----------------|--------------------------|----------------------------|
+| Backend  | `backend`      | `prisma generate` + `next build` | `next start` on `$PORT` |
+| Frontend | `/` (repo root)| `vite build` → `dist`    | `serve -s dist` on `$PORT` |
 
-Railway injects `PORT` automatically; both `start` scripts already read it.
-The `railway.json` in each root tells Railway how to build/start that service.
+Each service builds from a **Dockerfile** (`backend/Dockerfile` and root `Dockerfile`) — this
+bypasses Railway's auto-detection (Railpack/Nixpacks) so the build/start are deterministic and
+the `npm ci` lockfile/npm-version errors don't happen (Docker uses `npm install`). Railway injects
+`PORT` automatically; both `start` scripts read it.
+
+> ### ⚠️ Two things that cause the "npm ci ... date-fns" / "npx tsx server.ts" failure
+> 1. **Set each service's Root Directory** (Settings → Root Directory): Backend → `backend`,
+>    Frontend → `/`. Without this, Railway tries to build the whole monorepo as one app and guesses
+>    the wrong start command.
+> 2. **Deploy the branch that has this config.** These files live on `redesign-shootly-ui`. In each
+>    service: Settings → point the deployment to that branch (or merge it into `main` first).
+>    Building `main` (old lockfile, no Dockerfile) is what produced the errors you saw.
 
 ---
 
@@ -35,9 +45,8 @@ The `railway.json` in each root tells Railway how to build/start that service.
    ```
 
    Railway sets `PORT` for you — do **not** add it.
-5. Build/start are already defined by `backend/railway.json`
-   (`build: npm run build` = `prisma generate && next build`, `start: npm run start`).
-   Deploy.
+5. Build/start come from `backend/Dockerfile` (`npm run build` = `prisma generate && next build`,
+   then `next start`). Deploy.
 
 ## 2. Frontend service
 
@@ -52,8 +61,7 @@ The `railway.json` in each root tells Railway how to build/start that service.
 
    ⚠️ `VITE_API_URL` is **baked in at build time**. If the backend URL changes later, you must
    **redeploy the frontend** for it to take effect.
-5. Build/start come from the root `railway.json` (`build: npm run build` = `vite build`,
-   `start: serve -s dist`). Deploy.
+5. Build/start come from the root `Dockerfile` (`vite build`, then `serve -s dist`). Deploy.
 
 ## 3. Close the loop
 

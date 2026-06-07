@@ -1,0 +1,9 @@
+node_modules
+backend
+dist
+build
+.git
+.claude
+*.log
+.env
+.env.*
