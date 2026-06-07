@@ -8,7 +8,7 @@
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
     "setup": "npm install && npx prisma generate && npx prisma db push",
-    "start": "next start -p 3001",
+    "start": "next start -p ${PORT:-3001}",
     "dev": "next dev -p 3001"
   },
   "dependencies": {
