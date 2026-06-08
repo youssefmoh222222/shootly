@@ -131,7 +131,7 @@ export function Dashboard({
         const token = localStorage.getItem('ai_clothing_studio_token');
         const backendUrl = import.meta.env.DEV
           ? ''
-          : import.meta.env.VITE_API_URL || 'https://shootly-z6o8.vercel.app';
+          : import.meta.env.VITE_API_URL || 'https://web-production-99299.up.railway.app';
         const response = await fetch(`${backendUrl}/api/generations?brandId=${selectedBrand.id}`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           credentials: 'include',

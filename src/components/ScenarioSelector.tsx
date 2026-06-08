@@ -155,7 +155,7 @@ const API_URL = import.meta.env.DEV
   ? '/api'
   : import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
-  : 'https://shootly-z6o8.vercel.app/api';
+  : 'https://web-production-99299.up.railway.app/api';
 
 const vibeToCategory: Record<string, string> = {
   streetwear: 'STREETWEAR',

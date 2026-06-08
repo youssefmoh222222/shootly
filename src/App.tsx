@@ -10,7 +10,7 @@ import { PricingPage } from './components/PricingPage.tsx';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Backend API URL - Dev uses Vite proxy (/api → localhost:3001), prod hits Vercel directly
-const API_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'https://shootly-z6o8.vercel.app/api')
+const API_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'https://web-production-99299.up.railway.app/api')
 
 // Log the API URL for debugging
 console.log('API_URL:', API_URL);

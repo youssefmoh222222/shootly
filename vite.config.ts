@@ -39,7 +39,7 @@ export default defineConfig({
   define: {
     // Inject the backend URL at build time based on environment
     'import.meta.env.VITE_API_URL': JSON.stringify(
-      process.env.VITE_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://shootly-z6o8.vercel.app')
+      process.env.VITE_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'https://web-production-99299.up.railway.app')
     )
   },
   resolve: {

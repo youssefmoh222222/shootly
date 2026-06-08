@@ -8,7 +8,11 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 
-# Build the static site
+# Build the static site.
+# VITE_API_URL is baked into the bundle at build time. Railway passes service
+# variables to Docker builds as build args, but only if declared with ARG here.
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 COPY . .
 RUN npm run build
 
