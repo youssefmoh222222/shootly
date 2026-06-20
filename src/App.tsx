@@ -139,16 +139,21 @@ function App() {
             setIsAuthenticated(true);
             setCredits(data.credits);
             setCurrentView('dashboard');
-          } else {
-            // Token is invalid/expired — clear everything
+          } else if (response.status === 401 || response.status === 403) {
+            // Token genuinely invalid/expired — clear the session
             localStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
             localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
             localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
             sessionStorage.removeItem(STORAGE_KEYS.IS_AUTHENTICATED);
             sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          } else {
+            // Transient backend error (cold start / 5xx) — keep the session.
+            // Credits will load via the authenticated fetch once it's reachable.
+            setIsAuthenticated(true);
+            setCurrentView('dashboard');
           }
         } catch {
-          // Network error — allow access with stored token
+          // Network error — keep the session with the stored token
           setIsAuthenticated(true);
           setCurrentView('dashboard');
         }
